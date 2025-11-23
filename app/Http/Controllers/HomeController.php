@@ -73,6 +73,7 @@ class HomeController extends Controller
             ->get()
             ->map(function($project) {
                 return [
+                    'id' => $project->id,
                     'title' => $project->title,
                     'category' => $project->location ?? 'Project',
                     'image' => $project->image,

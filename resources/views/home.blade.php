@@ -125,7 +125,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             @foreach($projects as $project)
-            <div class="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+            <a href="{{ route('project.details', $project['id']) }}" class="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
                 <div class="aspect-w-16 aspect-h-12 bg-gray-200">
                     @if(isset($project['image']) && $project['image'])
                     <img src="{{ asset('storage/' . $project['image']) }}" 
@@ -147,8 +147,11 @@
                     <p class="text-sm text-gray-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
                         {{ $project['description'] }}
                     </p>
+                    <div class="mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-150">
+                        <span class="text-sm font-semibold text-primary-300">View Details →</span>
+                    </div>
                 </div>
-            </div>
+            </a>
             @endforeach
         </div>
 

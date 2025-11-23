@@ -12,6 +12,7 @@ class Project extends Model
         'image',
         'location',
         'year',
+        'status',
         'is_featured',
         'order',
     ];

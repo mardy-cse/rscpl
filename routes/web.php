@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\TestimonialController;
+use App\Http\Controllers\Admin\SettingController;
 use Illuminate\Support\Facades\Route;
 
 // Frontend Routes
@@ -15,6 +16,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/services', [PageController::class, 'services'])->name('services');
 Route::get('/gallery', [PageController::class, 'gallery'])->name('gallery');
+Route::get('/project/{id}', [PageController::class, 'projectDetails'])->name('project.details');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 Route::post('/contact', [PageController::class, 'submitContact'])->name('contact.submit');
 
@@ -68,4 +70,8 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
     Route::get('contacts', [ContactController::class, 'index'])->name('contacts.index');
     Route::get('contacts/{contact}', [ContactController::class, 'show'])->name('contacts.show');
     Route::delete('contacts/{contact}', [ContactController::class, 'destroy'])->name('contacts.destroy');
+    
+    // Settings
+    Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
+    Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
 });

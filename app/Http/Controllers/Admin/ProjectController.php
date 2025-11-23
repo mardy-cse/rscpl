@@ -28,6 +28,7 @@ class ProjectController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'location' => 'nullable|string|max:255',
             'year' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
+            'status' => 'required|in:Planning,In Progress,Completed,On Hold',
             'is_featured' => 'boolean',
             'order' => 'nullable|integer',
         ]);
@@ -58,6 +59,7 @@ class ProjectController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'location' => 'nullable|string|max:255',
             'year' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
+            'status' => 'required|in:Planning,In Progress,Completed,On Hold',
             'is_featured' => 'boolean',
             'order' => 'nullable|integer',
         ]);

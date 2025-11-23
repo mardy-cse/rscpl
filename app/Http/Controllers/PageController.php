@@ -49,6 +49,7 @@ class PageController extends Controller
             ->get()
             ->map(function($project) {
                 return [
+                    'id' => $project->id,
                     'title' => $project->title,
                     'category' => $project->location ?? 'General',
                     'image' => $project->image,
@@ -62,6 +63,26 @@ class PageController extends Controller
         $categories = ['All', 'Commercial', 'Industrial', 'Residential'];
 
         return view('gallery', compact('projects', 'categories'));
+    }
+
+    /**
+     * Display project details page.
+     *
+     * @param int $id
+     * @return \Illuminate\View\View
+     */
+    public function projectDetails($id)
+    {
+        $project = Project::findOrFail($id);
+        
+        // Get related projects from same category
+        $relatedProjects = Project::where('location', $project->location)
+            ->where('id', '!=', $project->id)
+            ->orderBy('order')
+            ->take(3)
+            ->get();
+
+        return view('project-details', compact('project', 'relatedProjects'));
     }
 
     /**

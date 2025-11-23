@@ -23,6 +23,7 @@
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Year</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Featured</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order</th>
                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -60,6 +61,17 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                             {{ $project->year }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                @if($project->status == 'Completed') bg-green-100 text-green-800
+                                @elseif($project->status == 'In Progress') bg-blue-100 text-blue-800
+                                @elseif($project->status == 'Planning') bg-yellow-100 text-yellow-800
+                                @elseif($project->status == 'On Hold') bg-red-100 text-red-800
+                                @else bg-gray-100 text-gray-800
+                                @endif">
+                                {{ $project->status ?? 'Completed' }}
+                            </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if($project->is_featured)

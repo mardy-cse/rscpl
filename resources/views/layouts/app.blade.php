@@ -33,6 +33,9 @@
     {{-- Tailwind CSS CDN --}}
     <script src="https://cdn.tailwindcss.com"></script>
     
+    {{-- FontAwesome Icons --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     {{-- Tailwind Custom Configuration --}}
     <script>
         tailwind.config = {
@@ -78,7 +81,7 @@
     @include('partials.footer')
     
     {{-- Floating WhatsApp Button --}}
-    <a href="https://wa.me/6585445560" 
+    <a href="https://wa.me/{{ App\Models\Setting::get('whatsapp', '6585445560') }}" 
        target="_blank" 
        rel="noopener noreferrer"
        class="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white rounded-full p-4 shadow-lg transition-all duration-300 hover:scale-110 z-50"
