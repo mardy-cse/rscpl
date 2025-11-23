@@ -17,28 +17,31 @@
 {{-- Services List --}}
 <section class="py-16 md:py-20 bg-gray-50">
     <div class="container mx-auto px-4">
-        @foreach($services as $index => $service)
+        @forelse($services as $index => $service)
         <div class="mb-16 last:mb-0">
             <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
                     {{-- Content --}}
                     <div class="p-8 md:p-12 {{ $index % 2 === 0 ? 'lg:order-1' : 'lg:order-2' }}">
                         <div class="flex items-center gap-3 mb-4">
+                            @if($service->icon)
                             <div class="bg-primary-100 p-3 rounded-lg">
-                                <svg class="w-8 h-8 text-primary-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                                </svg>
+                                <i class="{{ $service->icon }} text-3xl text-primary-700"></i>
                             </div>
-                            <h2 class="text-3xl md:text-4xl font-bold text-gray-900">{{ $service['title'] }}</h2>
+                            @endif
+                            <h2 class="text-3xl md:text-4xl font-bold text-gray-900">{{ $service->title }}</h2>
                         </div>
                         
-                        <p class="text-xl text-primary-700 font-semibold mb-4">{{ $service['description'] }}</p>
+                        <p class="text-xl text-primary-700 font-semibold mb-4">{{ $service->description }}</p>
                         
-                        <p class="text-gray-600 mb-6 leading-relaxed">{{ $service['details'] }}</p>
+                        @if($service->details)
+                        <p class="text-gray-600 mb-6 leading-relaxed">{{ $service->details }}</p>
+                        @endif
                         
+                        @if($service->features && count($service->features) > 0)
                         <h3 class="text-xl font-bold text-gray-900 mb-4">Key Features:</h3>
                         <ul class="space-y-3 mb-8">
-                            @foreach($service['features'] as $feature)
+                            @foreach($service->features as $feature)
                             <li class="flex items-start gap-3">
                                 <svg class="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -47,6 +50,7 @@
                             </li>
                             @endforeach
                         </ul>
+                        @endif
                         
                         <a href="{{ route('contact') }}" class="inline-block bg-primary-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-800 transition-colors">
                             Request Quote
@@ -55,15 +59,28 @@
                     
                     {{-- Image --}}
                     <div class="bg-gradient-to-br from-primary-100 to-blue-100 flex items-center justify-center p-8 {{ $index % 2 === 0 ? 'lg:order-2' : 'lg:order-1' }}">
-                        <img src="{{ asset('storage/services/' . $service['id'] . '.jpg') }}" 
-                             alt="{{ $service['title'] }}" 
-                             class="rounded-lg shadow-lg w-full h-full object-cover"
-                             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'500\' height=\'400\'%3E%3Crect fill=\'%23e0e7ff\' width=\'500\' height=\'400\'/%3E%3Ctext fill=\'%233b82f6\' font-family=\'sans-serif\' font-size=\'20\' x=\'50%25\' y=\'50%25\' text-anchor=\'middle\' dominant-baseline=\'middle\'%3E{{ $service['title'] }}%3C/text%3E%3C/svg%3E'">
+                        @if($service->image)
+                        <img src="{{ asset('storage/' . $service->image) }}" 
+                             alt="{{ $service->title }}" 
+                             class="rounded-lg shadow-lg w-full h-full object-cover max-h-96">
+                        @else
+                        <div class="w-full h-64 bg-gradient-to-br from-blue-100 to-primary-100 rounded-lg flex items-center justify-center">
+                            @if($service->icon)
+                            <i class="{{ $service->icon }} text-8xl text-primary-400"></i>
+                            @else
+                            <span class="text-6xl text-primary-400 font-bold">{{ substr($service->title, 0, 1) }}</span>
+                            @endif
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
-        @endforeach
+        @empty
+        <div class="text-center py-12">
+            <p class="text-gray-500 text-lg">No services available at the moment.</p>
+        </div>
+        @endforelse
     </div>
 </section>
 

@@ -32,12 +32,18 @@
             @foreach($projects as $project)
             <div class="gallery-item {{ $project['category'] }} bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer" 
                  data-category="{{ $project['category'] }}"
-                 onclick="openLightbox('{{ asset('storage/' . $project['image']) }}', '{{ $project['title'] }}', '{{ $project['description'] }}')">
+                 onclick="openLightbox('{{ isset($project['image']) && $project['image'] ? asset('storage/' . $project['image']) : '' }}', '{{ $project['title'] }}', '{{ $project['description'] }}')">
                 <div class="relative overflow-hidden group">
+                    @if(isset($project['image']) && $project['image'])
                     <img src="{{ asset('storage/' . $project['image']) }}" 
                          alt="{{ $project['title'] }}" 
                          class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
                          onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\'%3E%3Crect fill=\'%23e5e7eb\' width=\'400\' height=\'300\'/%3E%3Ctext fill=\'%239ca3af\' font-family=\'sans-serif\' font-size=\'16\' x=\'50%25\' y=\'50%25\' text-anchor=\'middle\' dominant-baseline=\'middle\'%3E{{ $project['title'] }}%3C/text%3E%3C/svg%3E'">
+                    @else
+                    <div class="w-full h-64 bg-gradient-to-br from-blue-100 to-primary-100 flex items-center justify-center">
+                        <span class="text-6xl text-primary-400 font-bold">{{ substr($project['title'], 0, 1) }}</span>
+                    </div>
+                    @endif
                     <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
                         <svg class="w-12 h-12 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
@@ -49,18 +55,27 @@
                 </div>
                 <div class="p-4">
                     <h3 class="text-lg font-bold text-gray-900 mb-1">{{ $project['title'] }}</h3>
-                    <p class="text-sm text-gray-600">{{ $project['description'] }}</p>
+                    <p class="text-sm text-gray-600 mb-2">{{ $project['description'] }}</p>
+                    @if(isset($project['year']) && $project['year'])
+                    <p class="text-xs text-gray-500">
+                        <i class="fas fa-calendar-alt mr-1"></i>{{ $project['year'] }}
+                    </p>
+                    @endif
                 </div>
             </div>
             @endforeach
         </div>
 
         {{-- No Results Message --}}
-        <div id="no-results" class="hidden text-center py-12">
-            <svg class="w-24 h-24 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <p class="text-xl text-gray-600">No projects found in this category.</p>
+        <div id="no-results" class="hidden text-center py-16">
+            <div class="bg-white rounded-lg shadow-lg p-8 max-w-md mx-auto">
+                <svg class="w-20 h-20 mx-auto text-primary-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">No Projects Found</h3>
+                <p class="text-gray-600 mb-4">There are no projects in <span id="category-name" class="font-semibold text-primary-700"></span> category yet.</p>
+                <p class="text-sm text-gray-500">Please check back later or browse other categories.</p>
+            </div>
         </div>
     </div>
 </section>
@@ -125,12 +140,17 @@
                 }
             });
             
-            // Show/hide no results message
+            // Show/hide no results message with category name
             const noResults = document.getElementById('no-results');
+            const categoryName = document.getElementById('category-name');
+            
             if (visibleCount === 0) {
+                categoryName.textContent = category === 'All' ? 'any' : category;
                 noResults.classList.remove('hidden');
+                document.getElementById('gallery-grid').classList.add('hidden');
             } else {
                 noResults.classList.add('hidden');
+                document.getElementById('gallery-grid').classList.remove('hidden');
             }
         });
     });

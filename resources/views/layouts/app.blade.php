@@ -30,7 +30,7 @@
     {{-- Favicon --}}
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     
-    {{-- Tailwind CSS CDN (for development - replace with compiled CSS in production) --}}
+    {{-- Tailwind CSS CDN --}}
     <script src="https://cdn.tailwindcss.com"></script>
     
     {{-- Tailwind Custom Configuration --}}
@@ -139,4 +139,3 @@
     </script>
 </body>
 </html>
-

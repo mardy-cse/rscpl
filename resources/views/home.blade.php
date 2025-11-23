@@ -127,10 +127,16 @@
             @foreach($projects as $project)
             <div class="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
                 <div class="aspect-w-16 aspect-h-12 bg-gray-200">
+                    @if(isset($project['image']) && $project['image'])
                     <img src="{{ asset('storage/' . $project['image']) }}" 
                          alt="{{ $project['title'] }}" 
                          class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
                          onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\'%3E%3Crect fill=\'%23ddd\' width=\'400\' height=\'300\'/%3E%3Ctext fill=\'%23999\' font-family=\'sans-serif\' font-size=\'18\' x=\'50%25\' y=\'50%25\' text-anchor=\'middle\' dominant-baseline=\'middle\'%3E{{ $project['title'] }}%3C/text%3E%3C/svg%3E'">
+                    @else
+                    <div class="w-full h-64 bg-gradient-to-br from-blue-100 to-primary-100 flex items-center justify-center">
+                        <span class="text-4xl text-primary-400 font-bold">{{ substr($project['title'], 0, 1) }}</span>
+                    </div>
+                    @endif
                 </div>
                 <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div class="absolute bottom-0 left-0 right-0 p-6 text-white transform translate-y-6 group-hover:translate-y-0 transition-transform duration-300">
@@ -175,9 +181,20 @@
                     @endforeach
                 </div>
                 <p class="text-gray-600 mb-6 italic">"{{ $testimonial['message'] }}"</p>
-                <div>
-                    <div class="font-bold text-gray-900">{{ $testimonial['name'] }}</div>
-                    <div class="text-sm text-gray-500">{{ $testimonial['company'] }}</div>
+                <div class="flex items-center gap-4">
+                    @if(isset($testimonial['avatar']) && $testimonial['avatar'])
+                    <img src="{{ asset('storage/' . $testimonial['avatar']) }}" 
+                         alt="{{ $testimonial['name'] }}" 
+                         class="w-12 h-12 rounded-full object-cover">
+                    @else
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-primary-600 flex items-center justify-center text-white font-bold text-lg">
+                        {{ substr($testimonial['name'], 0, 1) }}
+                    </div>
+                    @endif
+                    <div>
+                        <div class="font-bold text-gray-900">{{ $testimonial['name'] }}</div>
+                        <div class="text-sm text-gray-500">{{ $testimonial['company'] }}</div>
+                    </div>
                 </div>
             </div>
             @endforeach
