@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\TermsConditionController;
 use Illuminate\Support\Facades\Route;
 
 // Frontend Routes
@@ -19,6 +20,7 @@ Route::get('/gallery', [PageController::class, 'gallery'])->name('gallery');
 Route::get('/project/{id}', [PageController::class, 'projectDetails'])->name('project.details');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 Route::post('/contact', [PageController::class, 'submitContact'])->name('contact.submit');
+Route::get('/terms-conditions', [PageController::class, 'termsConditions'])->name('terms-conditions');
 
 // Sitemap
 Route::get('/sitemap.xml', function () {
@@ -74,4 +76,8 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
     // Settings
     Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
+    
+    // Terms & Conditions
+    Route::get('terms-conditions', [TermsConditionController::class, 'edit'])->name('terms-conditions.edit');
+    Route::put('terms-conditions', [TermsConditionController::class, 'update'])->name('terms-conditions.update');
 });

@@ -21,12 +21,13 @@ class ServiceController extends Controller
 
     public function store(Request $request)
     {
+        dd($request->all());
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'details' => 'nullable|string',
             'icon' => 'nullable|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'features' => 'nullable|string',
             'is_active' => 'boolean',
             'order' => 'nullable|integer',

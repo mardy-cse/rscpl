@@ -75,6 +75,14 @@
                             Contact Us
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('terms-conditions') }}" class="text-sm hover:text-primary-400 transition-colors flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                            Terms & Conditions
+                        </a>
+                    </li>
                 </ul>
             </div>
 

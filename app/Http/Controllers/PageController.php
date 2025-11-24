@@ -135,4 +135,14 @@ class PageController extends Controller
         return redirect()->route('contact')
             ->with('success', 'Thank you for contacting us! We will get back to you soon.');
     }
+
+    /**
+     * Display the terms and conditions page.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function termsConditions()
+    {
+        return view('terms-conditions');
+    }
 }
