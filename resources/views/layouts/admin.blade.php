@@ -42,14 +42,12 @@
         <aside id="sidebar" class="w-64 bg-gradient-to-b from-blue-900 to-blue-800 text-white flex-shrink-0 hidden md:block shadow-xl">
             <div class="p-6 border-b border-blue-700">
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
-                        <svg class="w-6 h-6 text-blue-900" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
-                        </svg>
-                    </div>
+                    <img src="{{ asset('images/logo.png') }}" 
+                         alt="HTR ENGINEERING Logo" 
+                         class="w-12 h-12 object-contain bg-white rounded-lg p-1">
                     <div>
-                        <h2 class="text-lg font-bold">RSCPL Admin</h2>
-                        <p class="text-xs text-blue-200">Management Panel</p>
+                        <h2 class="text-base font-bold leading-tight">HTR ENGINEERING</h2>
+                        <p class="text-xs text-blue-200">Admin Panel</p>
                     </div>
                 </div>
             </div>
