@@ -78,24 +78,76 @@
             <!-- Icon Field -->
             <div class="mb-6">
                 <label for="icon" class="block text-sm font-semibold text-gray-700 mb-2">
-                    Icon Class
+                    Service Icon <span class="text-red-500">*</span>
                 </label>
-                <div class="flex items-center space-x-3">
-                    @if($service->icon)
-                    <div class="flex-shrink-0 w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                        <i class="{{ $service->icon }} text-2xl text-blue-600"></i>
+                <div class="flex items-center space-x-4">
+                    <div class="flex-1">
+                        <select name="icon" 
+                                id="icon" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 @error('icon') border-red-500 @enderror"
+                                required
+                                onchange="updateIconPreview(this.value)">
+                            <option value="">-- Select Icon --</option>
+                            <optgroup label="🏗️ Construction & Building">
+                                <option value="fas fa-building" {{ old('icon', $service->icon) == 'fas fa-building' ? 'selected' : '' }}>Building</option>
+                                <option value="fas fa-home" {{ old('icon', $service->icon) == 'fas fa-home' ? 'selected' : '' }}>Home</option>
+                                <option value="fas fa-hammer" {{ old('icon', $service->icon) == 'fas fa-hammer' ? 'selected' : '' }}>Hammer</option>
+                                <option value="fas fa-tools" {{ old('icon', $service->icon) == 'fas fa-tools' ? 'selected' : '' }}>Tools</option>
+                                <option value="fas fa-wrench" {{ old('icon', $service->icon) == 'fas fa-wrench' ? 'selected' : '' }}>Wrench</option>
+                                <option value="fas fa-screwdriver" {{ old('icon', $service->icon) == 'fas fa-screwdriver' ? 'selected' : '' }}>Screwdriver</option>
+                                <option value="fas fa-hard-hat" {{ old('icon', $service->icon) == 'fas fa-hard-hat' ? 'selected' : '' }}>Hard Hat</option>
+                                <option value="fas fa-paint-roller" {{ old('icon', $service->icon) == 'fas fa-paint-roller' ? 'selected' : '' }}>Paint Roller</option>
+                            </optgroup>
+                            <optgroup label="🔒 Security & Safety">
+                                <option value="fas fa-shield-alt" {{ old('icon', $service->icon) == 'fas fa-shield-alt' ? 'selected' : '' }}>Shield</option>
+                                <option value="fas fa-lock" {{ old('icon', $service->icon) == 'fas fa-lock' ? 'selected' : '' }}>Lock</option>
+                                <option value="fas fa-key" {{ old('icon', $service->icon) == 'fas fa-key' ? 'selected' : '' }}>Key</option>
+                                <option value="fas fa-user-shield" {{ old('icon', $service->icon) == 'fas fa-user-shield' ? 'selected' : '' }}>User Shield</option>
+                                <option value="fas fa-eye" {{ old('icon', $service->icon) == 'fas fa-eye' ? 'selected' : '' }}>Eye (CCTV)</option>
+                                <option value="fas fa-video" {{ old('icon', $service->icon) == 'fas fa-video' ? 'selected' : '' }}>Video Camera</option>
+                            </optgroup>
+                            <optgroup label="🚪 Doors & Gates">
+                                <option value="fas fa-door-open" {{ old('icon', $service->icon) == 'fas fa-door-open' ? 'selected' : '' }}>Door Open</option>
+                                <option value="fas fa-door-closed" {{ old('icon', $service->icon) == 'fas fa-door-closed' ? 'selected' : '' }}>Door Closed</option>
+                                <option value="fas fa-warehouse" {{ old('icon', $service->icon) == 'fas fa-warehouse' ? 'selected' : '' }}>Warehouse</option>
+                                <option value="fas fa-dungeon" {{ old('icon', $service->icon) == 'fas fa-dungeon' ? 'selected' : '' }}>Gate</option>
+                            </optgroup>
+                            <optgroup label="⚙️ Mechanical & Industrial">
+                                <option value="fas fa-cog" {{ old('icon', $service->icon) == 'fas fa-cog' ? 'selected' : '' }}>Cog/Gear</option>
+                                <option value="fas fa-cogs" {{ old('icon', $service->icon) == 'fas fa-cogs' ? 'selected' : '' }}>Cogs/Gears</option>
+                                <option value="fas fa-industry" {{ old('icon', $service->icon) == 'fas fa-industry' ? 'selected' : '' }}>Industry</option>
+                                <option value="fas fa-bolt" {{ old('icon', $service->icon) == 'fas fa-bolt' ? 'selected' : '' }}>Bolt/Power</option>
+                            </optgroup>
+                            <optgroup label="📋 Services & Quality">
+                                <option value="fas fa-check-circle" {{ old('icon', $service->icon) == 'fas fa-check-circle' ? 'selected' : '' }}>Check Circle</option>
+                                <option value="fas fa-certificate" {{ old('icon', $service->icon) == 'fas fa-certificate' ? 'selected' : '' }}>Certificate</option>
+                                <option value="fas fa-award" {{ old('icon', $service->icon) == 'fas fa-award' ? 'selected' : '' }}>Award</option>
+                                <option value="fas fa-medal" {{ old('icon', $service->icon) == 'fas fa-medal' ? 'selected' : '' }}>Medal</option>
+                                <option value="fas fa-star" {{ old('icon', $service->icon) == 'fas fa-star' ? 'selected' : '' }}>Star</option>
+                                <option value="fas fa-clipboard-check" {{ old('icon', $service->icon) == 'fas fa-clipboard-check' ? 'selected' : '' }}>Clipboard Check</option>
+                            </optgroup>
+                            <optgroup label="🔧 Maintenance & Repair">
+                                <option value="fas fa-toolbox" {{ old('icon', $service->icon) == 'fas fa-toolbox' ? 'selected' : '' }}>Toolbox</option>
+                                <option value="fas fa-truck" {{ old('icon', $service->icon) == 'fas fa-truck' ? 'selected' : '' }}>Truck</option>
+                                <option value="fas fa-box-open" {{ old('icon', $service->icon) == 'fas fa-box-open' ? 'selected' : '' }}>Box Open</option>
+                                <option value="fas fa-boxes" {{ old('icon', $service->icon) == 'fas fa-boxes' ? 'selected' : '' }}>Boxes</option>
+                            </optgroup>
+                            <optgroup label="🏢 Commercial">
+                                <option value="fas fa-store" {{ old('icon', $service->icon) == 'fas fa-store' ? 'selected' : '' }}>Store</option>
+                                <option value="fas fa-city" {{ old('icon', $service->icon) == 'fas fa-city' ? 'selected' : '' }}>City</option>
+                                <option value="fas fa-briefcase" {{ old('icon', $service->icon) == 'fas fa-briefcase' ? 'selected' : '' }}>Briefcase</option>
+                            </optgroup>
+                        </select>
                     </div>
-                    @endif
-                    <input type="text" 
-                           name="icon" 
-                           id="icon" 
-                           value="{{ old('icon', $service->icon) }}"
-                           class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 @error('icon') border-red-500 @enderror"
-                           placeholder="e.g., fas fa-tools, fas fa-shield-alt">
+                    <div class="flex-shrink-0">
+                        <div class="w-16 h-16 bg-blue-50 border-2 border-blue-200 rounded-lg flex items-center justify-center">
+                            <i id="icon-preview" class="{{ $service->icon }} text-3xl text-blue-600"></i>
+                        </div>
+                    </div>
                 </div>
                 <p class="mt-2 text-xs text-gray-500">
                     <i class="fas fa-info-circle mr-1"></i>
-                    Use FontAwesome class names. Visit <a href="https://fontawesome.com/icons" target="_blank" class="text-blue-600 hover:underline">fontawesome.com/icons</a> for reference.
+                    Select an icon that best represents your service. Preview shown on the right.
                 </p>
                 @error('icon')
                     <p class="mt-2 text-sm text-red-600 flex items-center">
@@ -227,4 +279,31 @@
         </div>
     </div>
 </div>
+
+@push('styles')
+<style>
+    #icon option {
+        padding: 10px;
+    }
+</style>
+@endpush
+
+@push('scripts')
+<script>
+    // Update icon preview
+    function updateIconPreview(iconClass) {
+        const preview = document.getElementById('icon-preview');
+        preview.className = iconClass + ' text-3xl text-blue-600';
+    }
+
+    // Set initial preview on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const iconSelect = document.getElementById('icon');
+        if (iconSelect.value) {
+            updateIconPreview(iconSelect.value);
+        }
+    });
+</script>
+@endpush
+
 @endsection
