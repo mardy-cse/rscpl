@@ -134,7 +134,18 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('admin.terms-conditions.edit') }}" 
+                        <a href="{{ route('admin.profile.edit') }}"
+                           class="block px-4 py-3 rounded-lg transition-all duration-200 {{ request()->routeIs('admin.profile.*') ? 'bg-white text-blue-900 shadow-md' : 'hover:bg-blue-700 text-white' }}">
+                            <span class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                                Profile
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.terms-conditions.edit') }}"
                            class="block px-4 py-3 rounded-lg transition-all duration-200 {{ request()->routeIs('admin.terms-conditions.*') ? 'bg-white text-blue-900 shadow-md' : 'hover:bg-blue-700 text-white' }}">
                             <span class="flex items-center">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

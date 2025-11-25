@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TermsConditionController;
+use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use Illuminate\Support\Facades\Route;
 
 // Frontend Routes
@@ -76,6 +77,11 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
     // Settings
     Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
+    
+    // Profile
+    Route::get('profile', [AdminProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('profile', [AdminProfileController::class, 'update'])->name('profile.update');
+    Route::put('profile/password', [AdminProfileController::class, 'updatePassword'])->name('profile.password');
     
     // Terms & Conditions
     Route::get('terms-conditions', [TermsConditionController::class, 'edit'])->name('terms-conditions.edit');
