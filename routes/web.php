@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\PolicyController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ServiceController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TermsConditionController;
+use App\Http\Controllers\Admin\PolicyController as AdminPolicyController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -23,6 +25,10 @@ Route::get('/project/{id}', [PageController::class, 'projectDetails'])->name('pr
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 Route::post('/contact', [PageController::class, 'submitContact'])->name('contact.submit');
 Route::get('/terms-conditions', [PageController::class, 'termsConditions'])->name('terms-conditions');
+
+// Policy Routes
+Route::get('/privacy-policy', [PolicyController::class, 'privacyPolicy'])->name('privacy-policy');
+Route::get('/terms-of-service', [PolicyController::class, 'termsOfService'])->name('terms-of-service');
 
 // Sitemap
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
@@ -59,14 +65,15 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
     Route::get('contacts/{contact}', [ContactController::class, 'show'])->name('contacts.show');
     Route::delete('contacts/{contact}', [ContactController::class, 'destroy'])->name('contacts.destroy');
     
-    // Settings
-    Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
-    Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
-    
     // Profile
     Route::get('profile', [AdminProfileController::class, 'edit'])->name('profile.edit');
     Route::put('profile', [AdminProfileController::class, 'update'])->name('profile.update');
     Route::put('profile/password', [AdminProfileController::class, 'updatePassword'])->name('profile.password');
+    
+    // Policies (Privacy Policy & Terms of Service)
+    Route::get('policies', [AdminPolicyController::class, 'index'])->name('policies.index');
+    Route::get('policies/{policy}/edit', [AdminPolicyController::class, 'edit'])->name('policies.edit');
+    Route::put('policies/{policy}', [AdminPolicyController::class, 'update'])->name('policies.update');
     
     // Terms & Conditions
     Route::get('terms-conditions', [TermsConditionController::class, 'edit'])->name('terms-conditions.edit');
