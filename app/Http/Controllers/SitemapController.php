@@ -32,7 +32,7 @@ class SitemapController extends Controller
         $sitemap .= $this->addUrl(route('terms-conditions'), now(), 'monthly', '0.5');
         
         // Dynamic Project Pages
-        $projects = Project::where('is_active', true)->get();
+        $projects = Project::all();
         foreach ($projects as $project) {
             $sitemap .= $this->addUrl(
                 route('project.details', $project->id),
