@@ -86,12 +86,10 @@
             <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group transform hover:-translate-y-2">
                 <div class="bg-gradient-to-br from-primary-700 to-primary-900 p-6 text-white">
                     <div class="bg-white bg-opacity-20 w-16 h-16 rounded-lg flex items-center justify-center mb-4">
-                        @if(isset($service['icon']) && $service['icon'])
+                        @if(isset($service['icon']) && $service['icon'] && $service['icon'] != 'default')
                             <i class="{{ $service['icon'] }} text-4xl"></i>
                         @else
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                            </svg>
+                            <i class="fas fa-cog text-4xl"></i>
                         @endif
                     </div>
                     <h3 class="text-xl font-bold mb-2">{{ $service['title'] }}</h3>

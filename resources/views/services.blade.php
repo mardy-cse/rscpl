@@ -24,11 +24,13 @@
                     {{-- Content --}}
                     <div class="p-8 md:p-12 {{ $index % 2 === 0 ? 'lg:order-1' : 'lg:order-2' }}">
                         <div class="flex items-center gap-3 mb-4">
-                            @if($service->icon)
                             <div class="bg-primary-100 p-3 rounded-lg">
-                                <i class="{{ $service->icon }} text-3xl text-primary-700"></i>
+                                @if($service->icon)
+                                    <i class="{{ $service->icon }} text-3xl text-primary-700"></i>
+                                @else
+                                    <i class="fas fa-cog text-3xl text-primary-700"></i>
+                                @endif
                             </div>
-                            @endif
                             <h2 class="text-3xl md:text-4xl font-bold text-gray-900">{{ $service->title }}</h2>
                         </div>
                         
@@ -66,9 +68,9 @@
                         @else
                         <div class="w-full h-64 bg-gradient-to-br from-blue-100 to-primary-100 rounded-lg flex items-center justify-center">
                             @if($service->icon)
-                            <i class="{{ $service->icon }} text-8xl text-primary-400"></i>
+                                <i class="{{ $service->icon }} text-8xl text-primary-400"></i>
                             @else
-                            <span class="text-6xl text-primary-400 font-bold">{{ substr($service->title, 0, 1) }}</span>
+                                <i class="fas fa-cog text-8xl text-primary-400"></i>
                             @endif
                         </div>
                         @endif

@@ -61,7 +61,11 @@
                                     {{ $service->order }}
                                 </td>
                                 <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <i class="{{ $service->icon }} text-2xl text-blue-600"></i>
+                                    @if($service->icon)
+                                        <i class="{{ $service->icon }} text-2xl text-blue-600"></i>
+                                    @else
+                                        <i class="fas fa-cog text-2xl text-gray-400"></i>
+                                    @endif
                                 </td>
                                 <td class="px-4 py-4 whitespace-nowrap">
                                     <div class="text-sm font-medium text-gray-900">{{ $service->title }}</div>
