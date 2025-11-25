@@ -131,6 +131,94 @@
                 </div>
             </div>
 
+            <div class="mb-6">
+                <h2 class="text-lg font-bold text-gray-800 mb-4 pb-2 border-b">
+                    <i class="fab fa-facebook mr-2 text-blue-600"></i>
+                    Social Media Links
+                </h2>
+                
+                <div class="grid grid-cols-1 gap-6">
+                    <div>
+                        <label for="facebook_url" class="block text-gray-700 font-semibold mb-2">
+                            <i class="fab fa-facebook-square text-blue-600 mr-2"></i>
+                            Facebook Page URL
+                        </label>
+                        <input type="url" 
+                               name="facebook_url" 
+                               id="facebook_url" 
+                               value="{{ old('facebook_url', $settings['facebook_url'] ?? '') }}"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 @error('facebook_url') border-red-500 @enderror"
+                               placeholder="https://facebook.com/yourpage">
+                        <p class="text-xs text-gray-500 mt-1">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Enter your Facebook page URL (e.g., https://facebook.com/yourpage)
+                        </p>
+                        @error('facebook_url')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="instagram_url" class="block text-gray-700 font-semibold mb-2">
+                            <i class="fab fa-instagram text-pink-600 mr-2"></i>
+                            Instagram Profile URL
+                        </label>
+                        <input type="url" 
+                               name="instagram_url" 
+                               id="instagram_url" 
+                               value="{{ old('instagram_url', $settings['instagram_url'] ?? '') }}"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 @error('instagram_url') border-red-500 @enderror"
+                               placeholder="https://instagram.com/yourprofile">
+                        <p class="text-xs text-gray-500 mt-1">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Enter your Instagram profile URL (e.g., https://instagram.com/yourprofile)
+                        </p>
+                        @error('instagram_url')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="whatsapp_url" class="block text-gray-700 font-semibold mb-2">
+                            <i class="fab fa-whatsapp text-green-600 mr-2"></i>
+                            WhatsApp Link URL
+                        </label>
+                        <input type="url" 
+                               name="whatsapp_url" 
+                               id="whatsapp_url" 
+                               value="{{ old('whatsapp_url', $settings['whatsapp_url'] ?? '') }}"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 @error('whatsapp_url') border-red-500 @enderror"
+                               placeholder="https://wa.me/6586973181">
+                        <p class="text-xs text-gray-500 mt-1">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            WhatsApp link format: https://wa.me/[phone_number] (e.g., https://wa.me/6586973181)
+                        </p>
+                        @error('whatsapp_url')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-lightbulb text-yellow-600 text-lg"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-yellow-700 mb-2">
+                                <strong>Tips:</strong>
+                            </p>
+                            <ul class="text-xs text-yellow-700 space-y-1">
+                                <li>• Leave fields empty to hide social media icons on the website</li>
+                                <li>• Facebook: Right-click your page → Copy link</li>
+                                <li>• Instagram: Open your profile → Share → Copy link</li>
+                                <li>• WhatsApp: Use format https://wa.me/[country_code][phone_number]</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="flex gap-4 pt-4 border-t">
                 <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition duration-200 shadow-md hover:shadow-lg">
                     <i class="fas fa-save mr-2"></i>

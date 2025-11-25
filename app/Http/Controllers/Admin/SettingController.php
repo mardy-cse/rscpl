@@ -22,6 +22,9 @@ class SettingController extends Controller
             'business_hours' => 'required|string|max:255',
             'address' => 'required|string|max:255',
             'whatsapp' => 'required|string|max:20',
+            'facebook_url' => 'nullable|url|max:255',
+            'instagram_url' => 'nullable|url|max:255',
+            'whatsapp_url' => 'nullable|url|max:255',
         ]);
         
         foreach ($validated as $key => $value) {

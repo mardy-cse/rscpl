@@ -26,6 +26,9 @@ return new class extends Migration
             ['key' => 'business_hours', 'value' => 'Mon-Fri: 9AM-6PM | Sat: 9AM-1PM', 'created_at' => now(), 'updated_at' => now()],
             ['key' => 'address', 'value' => 'Singapore', 'created_at' => now(), 'updated_at' => now()],
             ['key' => 'whatsapp', 'value' => '6586973181', 'created_at' => now(), 'updated_at' => now()],
+            ['key' => 'facebook_url', 'value' => 'https://facebook.com/', 'created_at' => now(), 'updated_at' => now()],
+            ['key' => 'instagram_url', 'value' => 'https://instagram.com/', 'created_at' => now(), 'updated_at' => now()],
+            ['key' => 'whatsapp_url', 'value' => 'https://wa.me/6586973181', 'created_at' => now(), 'updated_at' => now()],
         ]);
     }
 
