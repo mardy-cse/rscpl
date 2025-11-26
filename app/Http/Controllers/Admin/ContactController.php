@@ -2,28 +2,40 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Models\Contact;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
+use App\Services\ContactService;
 
-class ContactController extends Controller
+class ContactController extends AdminController
 {
-    public function index()
+    protected ContactService $contactService;
+
+    public function __construct(ContactService $contactService)
     {
-        $contacts = Contact::latest()->paginate(20);
+        parent::__construct();
+        $this->contactService = $contactService;
+    }
+
+    public function index(): View
+    {
+        $contacts = $this->contactService->getAllPaginated(20);
         return view('admin.contacts.index', compact('contacts'));
     }
 
-    public function show(Contact $contact)
+    public function show(Contact $contact): View
     {
         return view('admin.contacts.show', compact('contact'));
     }
 
-    public function destroy(Contact $contact)
+    public function destroy(Contact $contact): RedirectResponse
     {
-        $contact->delete();
-
-        return redirect()->route('admin.contacts.index')
-            ->with('success', 'Contact deleted successfully.');
+        return $this->handleDelete(
+            fn() => $this->contactService->delete($contact),
+            'contact',
+            'admin.contacts.index',
+            ['contact_id' => $contact->id]
+        );
     }
 }

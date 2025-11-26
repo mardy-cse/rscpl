@@ -2,93 +2,79 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Models\Project;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\StoreProjectRequest;
+use App\Http\Requests\UpdateProjectRequest;
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
+use App\Services\ProjectService;
 
-class ProjectController extends Controller
+class ProjectController extends AdminController
 {
-    public function index()
+    protected ProjectService $projectService;
+
+    public function __construct(ProjectService $projectService)
     {
-        $projects = Project::orderBy('order')->get();
+        parent::__construct();
+        $this->projectService = $projectService;
+    }
+    public function index(): View
+    {
+        $projects = $this->projectService->getAll();
         return view('admin.projects.index', compact('projects'));
     }
 
-    public function create()
+    public function create(): View
     {
         return view('admin.projects.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreProjectRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'location' => 'nullable|string|max:255',
-            'year' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
-            'status' => 'required|in:Planning,In Progress,Completed,On Hold',
-            'is_featured' => 'boolean',
-            'order' => 'nullable|integer',
-        ]);
+        return $this->handleCreate(function () use ($request) {
+            $validated = $request->validated();
 
-        // Handle checkbox - if not checked, set to false
-        $validated['is_featured'] = $request->has('is_featured') ? 1 : 0;
+            if ($request->hasFile('image')) {
+                $validated['image'] = $this->projectService->uploadImage($request->file('image'));
+            }
 
-        if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('projects', 'public');
-        }
-
-        Project::create($validated);
-
-        return redirect()->route('admin.projects.index')
-            ->with('success', 'Project created successfully.');
+            $this->projectService->create($validated);
+        }, 'project', 'admin.projects.index');
     }
 
-    public function edit(Project $project)
+    public function edit(Project $project): View
     {
         return view('admin.projects.edit', compact('project'));
     }
 
-    public function update(Request $request, Project $project)
+    public function update(UpdateProjectRequest $request, Project $project): RedirectResponse
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'location' => 'nullable|string|max:255',
-            'year' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
-            'status' => 'required|in:Planning,In Progress,Completed,On Hold',
-            'is_featured' => 'boolean',
-            'order' => 'nullable|integer',
-        ]);
+        return $this->handleUpdate(function () use ($request, $project) {
+            $validated = $request->validated();
+            $oldImage = $project->image;
 
-        // Handle checkbox - if not checked, set to false
-        $validated['is_featured'] = $request->has('is_featured') ? 1 : 0;
-
-        if ($request->hasFile('image')) {
-            if ($project->image) {
-                Storage::disk('public')->delete($project->image);
+            if ($request->hasFile('image')) {
+                $validated['image'] = $this->projectService->uploadImage($request->file('image'));
             }
-            $validated['image'] = $request->file('image')->store('projects', 'public');
-        }
 
-        $project->update($validated);
+            $this->projectService->update($project, $validated);
 
-        return redirect()->route('admin.projects.index')
-            ->with('success', 'Project updated successfully.');
+            if ($request->hasFile('image') && $oldImage) {
+                $this->projectService->deleteImage($oldImage);
+            }
+        }, 'project', 'admin.projects.index', ['project_id' => $project->id]);
     }
 
-    public function destroy(Project $project)
+    public function destroy(Project $project): RedirectResponse
     {
-        if ($project->image) {
-            Storage::disk('public')->delete($project->image);
-        }
-
-        $project->delete();
-
-        return redirect()->route('admin.projects.index')
-            ->with('success', 'Project deleted successfully.');
+        return $this->handleDelete(function () use ($project) {
+            $imagePath = $project->image;
+            $this->projectService->delete($project);
+            
+            if ($imagePath) {
+                $this->projectService->deleteImage($imagePath);
+            }
+        }, 'project', 'admin.projects.index', ['project_id' => $project->id]);
     }
 }

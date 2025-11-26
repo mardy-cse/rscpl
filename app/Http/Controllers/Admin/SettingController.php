@@ -2,36 +2,35 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use Illuminate\Http\Request;
+use App\Http\Requests\UpdateSettingsRequest;
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
+use App\Services\SettingService;
 
-class SettingController extends Controller
+class SettingController extends AdminController
 {
-    public function index()
+    protected SettingService $settingService;
+
+    public function __construct(SettingService $settingService)
     {
-        $settings = Setting::all()->pluck('value', 'key');
+        parent::__construct();
+        $this->settingService = $settingService;
+    }
+
+    public function index(): View
+    {
+        $settings = $this->settingService->getAll();
         return view('admin.settings.index', compact('settings'));
     }
     
-    public function update(Request $request)
+    public function update(UpdateSettingsRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'phone' => 'required|string|max:20',
-            'email' => 'required|email|max:255',
-            'business_hours' => 'required|string|max:255',
-            'address' => 'required|string|max:255',
-            'whatsapp' => 'required|string|max:20',
-            'facebook_url' => 'nullable|url|max:255',
-            'instagram_url' => 'nullable|url|max:255',
-            'whatsapp_url' => 'nullable|url|max:255',
-        ]);
-        
-        foreach ($validated as $key => $value) {
-            Setting::set($key, $value);
-        }
-        
-        return redirect()->route('admin.settings.index')
-            ->with('success', 'Settings updated successfully.');
+        return $this->handleUpdate(
+            fn() => $this->settingService->updateMany($request->validated()),
+            'settings',
+            'admin.settings.index'
+        );
     }
 }

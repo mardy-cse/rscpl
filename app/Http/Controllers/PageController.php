@@ -9,9 +9,29 @@ use App\Models\GalleryImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ContactReceived;
+use App\Http\Requests\StoreContactRequest;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Services\ServiceService;
+use App\Services\ProjectService;
+use App\Services\ContactService;
 
 class PageController extends Controller
 {
+    protected ServiceService $serviceService;
+    protected ProjectService $projectService;
+    protected ContactService $contactService;
+
+    public function __construct(
+        ServiceService $serviceService,
+        ProjectService $projectService,
+        ContactService $contactService
+    ) {
+        $this->serviceService = $serviceService;
+        $this->projectService = $projectService;
+        $this->contactService = $contactService;
+    }
+
     /**
      * Display the about page.
      *
@@ -29,11 +49,7 @@ class PageController extends Controller
      */
     public function services()
     {
-        // Fetch services from database
-        $services = Service::where('is_active', true)
-            ->orderBy('order')
-            ->get();
-
+        $services = $this->serviceService->getActive();
         return view('services', compact('services'));
     }
 
@@ -44,22 +60,7 @@ class PageController extends Controller
      */
     public function gallery()
     {
-        // Fetch all projects from database
-        $projects = Project::orderBy('order')
-            ->get()
-            ->map(function($project) {
-                return [
-                    'id' => $project->id,
-                    'title' => $project->title,
-                    'category' => $project->location ?? 'General',
-                    'image' => $project->image,
-                    'description' => $project->description,
-                    'year' => $project->year
-                ];
-            })
-            ->toArray();
-        
-        // Always show all three categories
+        $projects = $this->projectService->getAllForGallery();
         $categories = ['All', 'Commercial', 'Industrial', 'Residential'];
 
         return view('gallery', compact('projects', 'categories'));
@@ -71,16 +72,10 @@ class PageController extends Controller
      * @param int $id
      * @return \Illuminate\View\View
      */
-    public function projectDetails($id)
+    public function projectDetails(int $id)
     {
-        $project = Project::findOrFail($id);
-        
-        // Get related projects from same category
-        $relatedProjects = Project::where('location', $project->location)
-            ->where('id', '!=', $project->id)
-            ->orderBy('order')
-            ->take(3)
-            ->get();
+        $project = $this->projectService->findById($id);
+        $relatedProjects = $this->projectService->getRelated($project->location, $project->id, 3);
 
         return view('project-details', compact('project', 'relatedProjects'));
     }
@@ -98,42 +93,69 @@ class PageController extends Controller
     /**
      * Handle contact form submission.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \App\Http\Requests\StoreContactRequest $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
-    public function submitContact(Request $request)
+    public function submitContact(StoreContactRequest $request)
     {
-        // Validate the form data
-        $validated = $request->validate([
-            'name' => 'required|string|max:100',
-            'email' => 'required|email|max:255',
-            'phone' => 'nullable|string|max:20',
-            'subject' => 'nullable|string|max:255',
-            'message' => 'required|string|max:2000',
-        ]);
-
-        // Save to database
-        $contact = Contact::create($validated);
-
-        // Send email notification
         try {
-            Mail::to(config('mail.from.address'))->send(new ContactReceived($contact));
+            $validated = $request->validated();
+
+            // Additional spam check: prevent duplicate submissions within 1 minute
+            if ($this->contactService->hasRecentSubmission($validated['email'], 1)) {
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'You have already submitted a message recently. Please wait before submitting again.',
+                    ], 429);
+                }
+
+                return redirect()->back()
+                    ->with('error', 'You have already submitted a message recently. Please wait before submitting again.');
+            }
+
+            // Use transaction for database save and email
+            $contact = DB::transaction(function () use ($validated) {
+                return $this->contactService->create($validated);
+            });
+
+            // Send email notification (outside transaction, async would be better)
+            try {
+                Mail::to(config('mail.from.address'))->send(new ContactReceived($contact));
+            } catch (\Exception $e) {
+                // Log the error but don't fail the request
+                Log::error('Failed to send contact email', [
+                    'contact_id' => $contact->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+
+            // Return JSON for AJAX requests
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Thank you for contacting us! We will get back to you soon.'
+                ]);
+            }
+
+            // Redirect with success message for regular form submissions
+            return redirect()->route('contact')
+                ->with('success', 'Thank you for contacting us! We will get back to you soon.');
+                
         } catch (\Exception $e) {
-            // Log the error but don't fail the request
-            \Log::error('Failed to send contact email: ' . $e->getMessage());
+            Log::error('Contact form submission failed', ['error' => $e->getMessage()]);
+            
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'An error occurred. Please try again later.'
+                ], 500);
+            }
+            
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'An error occurred. Please try again later.');
         }
-
-        // Return JSON for AJAX requests
-        if ($request->ajax() || $request->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Thank you for contacting us! We will get back to you soon.'
-            ]);
-        }
-
-        // Redirect with success message for regular form submissions
-        return redirect()->route('contact')
-            ->with('success', 'Thank you for contacting us! We will get back to you soon.');
     }
 
     /**

@@ -6,9 +6,26 @@ use App\Models\Service;
 use App\Models\Project;
 use App\Models\Testimonial;
 use Illuminate\Http\Request;
+use App\Services\ServiceService;
+use App\Services\ProjectService;
+use App\Services\TestimonialService;
 
 class HomeController extends Controller
 {
+    protected ServiceService $serviceService;
+    protected ProjectService $projectService;
+    protected TestimonialService $testimonialService;
+
+    public function __construct(
+        ServiceService $serviceService,
+        ProjectService $projectService,
+        TestimonialService $testimonialService
+    ) {
+        $this->serviceService = $serviceService;
+        $this->projectService = $projectService;
+        $this->testimonialService = $testimonialService;
+    }
+
     /**
      * Display the home page.
      *
@@ -17,22 +34,40 @@ class HomeController extends Controller
     public function index()
     {
         // Fetch active services from database
-        $services = Service::where('is_active', true)
-            ->orderBy('order')
-            ->take(6)
-            ->get()
-            ->map(function($service) {
-                return [
-                    'title' => $service->title,
-                    'description' => $service->description,
-                    'icon' => $service->icon ?? 'default'
-                ];
-            })
-            ->toArray();
+        $services = $this->serviceService->getActiveForHome(6);
         
         // If no services in database, use fallback
         if (empty($services)) {
-            $services = [
+            $services = $this->getFallbackServices();
+        }
+
+        // Fetch featured projects from database
+        $projects = $this->projectService->getFeaturedForHome(3);
+        
+        // Fallback if no projects
+        if (empty($projects)) {
+            $projects = $this->getFallbackProjects();
+        }
+
+        // Fetch testimonials from database
+        $testimonials = $this->testimonialService->getActiveForHome(3);
+        
+        // Fallback testimonials
+        if (empty($testimonials)) {
+            $testimonials = $this->getFallbackTestimonials();
+        }
+
+        return view('home', compact('services', 'projects', 'testimonials'));
+    }
+
+    /**
+     * Get fallback services data.
+     *
+     * @return array
+     */
+    private function getFallbackServices(): array
+    {
+        return [
             [
                 'title' => 'Roller Shutters',
                 'description' => 'High-quality roller shutters for commercial and residential properties. Durable, secure, and customizable.',
@@ -64,27 +99,16 @@ class HomeController extends Controller
                 'icon' => 'maintenance'
             ],
         ];
-        }
+    }
 
-        // Fetch featured projects from database
-        $projects = Project::where('is_featured', true)
-            ->orderBy('order')
-            ->take(3)
-            ->get()
-            ->map(function($project) {
-                return [
-                    'id' => $project->id,
-                    'title' => $project->title,
-                    'category' => $project->location ?? 'Project',
-                    'image' => $project->image,
-                    'description' => $project->description
-                ];
-            })
-            ->toArray();
-        
-        // Fallback if no projects
-        if (empty($projects)) {
-            $projects = [
+    /**
+     * Get fallback projects data.
+     *
+     * @return array
+     */
+    private function getFallbackProjects(): array
+    {
+        return [
                 [
                     'title' => 'Commercial Warehouse Security',
                     'category' => 'Commercial',
@@ -104,27 +128,16 @@ class HomeController extends Controller
                     'description' => 'Heavy-duty roller shutters and security grilles for manufacturing plant.'
                 ],
             ];
-        }
+    }
 
-        // Fetch testimonials from database
-        $testimonials = Testimonial::where('is_active', true)
-            ->orderBy('order')
-            ->take(3)
-            ->get()
-            ->map(function($testimonial) {
-                return [
-                    'name' => $testimonial->name,
-                    'company' => $testimonial->company ?? 'Valued Client',
-                    'message' => $testimonial->content,
-                    'rating' => $testimonial->rating,
-                    'avatar' => $testimonial->avatar
-                ];
-            })
-            ->toArray();
-        
-        // Fallback testimonials
-        if (empty($testimonials)) {
-            $testimonials = [
+    /**
+     * Get fallback testimonials data.
+     *
+     * @return array
+     */
+    private function getFallbackTestimonials(): array
+    {
+        return [
                 [
                     'name' => 'David Tan',
                     'company' => 'Warehouse Solutions Pte Ltd',
@@ -144,8 +157,5 @@ class HomeController extends Controller
                     'rating' => 5
                 ],
             ];
-        }
-
-        return view('home', compact('services', 'projects', 'testimonials'));
     }
 }

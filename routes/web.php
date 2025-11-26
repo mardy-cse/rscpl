@@ -23,7 +23,9 @@ Route::get('/services', [PageController::class, 'services'])->name('services');
 Route::get('/gallery', [PageController::class, 'gallery'])->name('gallery');
 Route::get('/project/{id}', [PageController::class, 'projectDetails'])->name('project.details');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
-Route::post('/contact', [PageController::class, 'submitContact'])->name('contact.submit');
+Route::post('/contact', [PageController::class, 'submitContact'])
+    ->middleware(['throttle:contact', 'throttle.contact'])
+    ->name('contact.submit');
 Route::get('/terms-conditions', [PageController::class, 'termsConditions'])->name('terms-conditions');
 
 // Policy Routes
@@ -64,6 +66,10 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
     Route::get('contacts', [ContactController::class, 'index'])->name('contacts.index');
     Route::get('contacts/{contact}', [ContactController::class, 'show'])->name('contacts.show');
     Route::delete('contacts/{contact}', [ContactController::class, 'destroy'])->name('contacts.destroy');
+    
+    // Settings
+    Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
+    Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
     
     // Profile
     Route::get('profile', [AdminProfileController::class, 'edit'])->name('profile.edit');

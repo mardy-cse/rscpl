@@ -22,4 +22,20 @@ class Service extends Model
         'order' => 'integer',
         'features' => 'array',
     ];
+
+    /**
+     * Scope a query to only include active services.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * Scope a query to order services by order field.
+     */
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('order');
+    }
 }

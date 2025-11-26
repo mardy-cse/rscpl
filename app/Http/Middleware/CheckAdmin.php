@@ -15,8 +15,15 @@ class CheckAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!auth()->check() || auth()->user()->role !== 'admin') {
-            return redirect()->route('home')->with('error', 'Unauthorized access. Admin privileges required.');
+        // Check if user is authenticated
+        if (!auth()->check()) {
+            return redirect()->route('login')
+                ->with('error', 'Please log in first.');
+        }
+
+        // Check if user is admin
+        if (!auth()->user()->isAdmin()) {
+            abort(403, 'Unauthorized. Admin access required.');
         }
 
         return $next($request);

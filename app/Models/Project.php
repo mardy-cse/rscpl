@@ -22,4 +22,28 @@ class Project extends Model
         'order' => 'integer',
         'year' => 'integer',
     ];
+
+    /**
+     * Scope a query to only include featured projects.
+     */
+    public function scopeFeatured($query)
+    {
+        return $query->where('is_featured', true);
+    }
+
+    /**
+     * Scope a query to order projects by order field.
+     */
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('order');
+    }
+
+    /**
+     * Scope a query to filter by location.
+     */
+    public function scopeLocation($query, string $location)
+    {
+        return $query->where('location', $location);
+    }
 }

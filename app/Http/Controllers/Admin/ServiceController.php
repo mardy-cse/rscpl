@@ -2,106 +2,79 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Models\Service;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreServiceRequest;
+use App\Http\Requests\UpdateServiceRequest;
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
+use App\Services\ServiceService;
 
-class ServiceController extends Controller
+class ServiceController extends AdminController
 {
-    public function index()
+    protected ServiceService $serviceService;
+
+    public function __construct(ServiceService $serviceService)
     {
-        $services = Service::orderBy('order')->get();
+        parent::__construct();
+        $this->serviceService = $serviceService;
+    }
+    public function index(): View
+    {
+        $services = $this->serviceService->getAll();
         return view('admin.services.index', compact('services'));
     }
 
-    public function create()
+    public function create(): View
     {
         return view('admin.services.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreServiceRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'details' => 'nullable|string',
-            'icon' => 'nullable|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'features' => 'nullable|string',
-            'is_active' => 'boolean',
-            'order' => 'nullable|integer',
-        ]);
+        return $this->handleCreate(function () use ($request) {
+            $validated = $request->validated();
 
-        // Handle checkbox - if not checked, set to false
-        $validated['is_active'] = $request->has('is_active') ? 1 : 0;
+            if ($request->hasFile('image')) {
+                $validated['image'] = $this->serviceService->uploadImage($request->file('image'));
+            }
 
-        // Handle image upload
-        if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('services', 'public');
-        }
-
-        // Convert features from newline-separated string to array
-        if ($request->filled('features')) {
-            $validated['features'] = array_filter(array_map('trim', explode("\n", $request->features)));
-        }
-
-        Service::create($validated);
-
-        return redirect()->route('admin.services.index')
-            ->with('success', 'Service created successfully.');
+            $this->serviceService->create($validated);
+        }, 'service', 'admin.services.index');
     }
 
-    public function edit(Service $service)
+    public function edit(Service $service): View
     {
         return view('admin.services.edit', compact('service'));
     }
 
-    public function update(Request $request, Service $service)
+    public function update(UpdateServiceRequest $request, Service $service): RedirectResponse
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'details' => 'nullable|string',
-            'icon' => 'nullable|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'features' => 'nullable|string',
-            'is_active' => 'boolean',
-            'order' => 'nullable|integer',
-        ]);
+        return $this->handleUpdate(function () use ($request, $service) {
+            $validated = $request->validated();
+            $oldImage = $service->image;
 
-        // Handle checkbox - if not checked, set to false
-        $validated['is_active'] = $request->has('is_active') ? 1 : 0;
-
-        // Handle image upload
-        if ($request->hasFile('image')) {
-            // Delete old image
-            if ($service->image) {
-                \Storage::disk('public')->delete($service->image);
+            if ($request->hasFile('image')) {
+                $validated['image'] = $this->serviceService->uploadImage($request->file('image'));
             }
-            $validated['image'] = $request->file('image')->store('services', 'public');
-        }
 
-        // Convert features from newline-separated string to array
-        if ($request->filled('features')) {
-            $validated['features'] = array_filter(array_map('trim', explode("\n", $request->features)));
-        }
+            $this->serviceService->update($service, $validated);
 
-        $service->update($validated);
-
-        return redirect()->route('admin.services.index')
-            ->with('success', 'Service updated successfully.');
+            if ($request->hasFile('image') && $oldImage) {
+                $this->serviceService->deleteImage($oldImage);
+            }
+        }, 'service', 'admin.services.index', ['service_id' => $service->id]);
     }
 
-    public function destroy(Service $service)
+    public function destroy(Service $service): RedirectResponse
     {
-        // Delete image if exists
-        if ($service->image) {
-            \Storage::disk('public')->delete($service->image);
-        }
-        
-        $service->delete();
-
-        return redirect()->route('admin.services.index')
-            ->with('success', 'Service deleted successfully.');
+        return $this->handleDelete(function () use ($service) {
+            $imagePath = $service->image;
+            $this->serviceService->delete($service);
+            
+            if ($imagePath) {
+                $this->serviceService->deleteImage($imagePath);
+            }
+        }, 'service', 'admin.services.index', ['service_id' => $service->id]);
     }
 }

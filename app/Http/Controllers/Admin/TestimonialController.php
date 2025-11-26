@@ -2,91 +2,80 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Models\Testimonial;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\StoreTestimonialRequest;
+use App\Http\Requests\UpdateTestimonialRequest;
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
+use App\Services\TestimonialService;
 
-class TestimonialController extends Controller
+class TestimonialController extends AdminController
 {
-    public function index()
+    protected TestimonialService $testimonialService;
+
+    public function __construct(TestimonialService $testimonialService)
     {
-        $testimonials = Testimonial::orderBy('order')->get();
+        parent::__construct();
+        $this->testimonialService = $testimonialService;
+    }
+
+    public function index(): View
+    {
+        $testimonials = $this->testimonialService->getAll();
         return view('admin.testimonials.index', compact('testimonials'));
     }
 
-    public function create()
+    public function create(): View
     {
         return view('admin.testimonials.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreTestimonialRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'company' => 'nullable|string|max:255',
-            'content' => 'required|string',
-            'rating' => 'required|integer|min:1|max:5',
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'is_active' => 'boolean',
-            'order' => 'nullable|integer',
-        ]);
+        return $this->handleCreate(function () use ($request) {
+            $validated = $request->validated();
 
-        // Handle checkbox - if not checked, set to false
-        $validated['is_active'] = $request->has('is_active') ? 1 : 0;
+            if ($request->hasFile('avatar')) {
+                $validated['avatar'] = $this->testimonialService->uploadAvatar($request->file('avatar'));
+            }
 
-        if ($request->hasFile('avatar')) {
-            $validated['avatar'] = $request->file('avatar')->store('testimonials', 'public');
-        }
-
-        Testimonial::create($validated);
-
-        return redirect()->route('admin.testimonials.index')
-            ->with('success', 'Testimonial created successfully.');
+            $this->testimonialService->create($validated);
+        }, 'testimonial', 'admin.testimonials.index');
     }
 
-    public function edit(Testimonial $testimonial)
+    public function edit(Testimonial $testimonial): View
     {
         return view('admin.testimonials.edit', compact('testimonial'));
     }
 
-    public function update(Request $request, Testimonial $testimonial)
+    public function update(UpdateTestimonialRequest $request, Testimonial $testimonial): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'company' => 'nullable|string|max:255',
-            'content' => 'required|string',
-            'rating' => 'required|integer|min:1|max:5',
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'is_active' => 'boolean',
-            'order' => 'nullable|integer',
-        ]);
+        return $this->handleUpdate(function () use ($request, $testimonial) {
+            $validated = $request->validated();
+            $oldAvatar = $testimonial->avatar;
 
-        // Handle checkbox - if not checked, set to false
-        $validated['is_active'] = $request->has('is_active') ? 1 : 0;
-
-        if ($request->hasFile('avatar')) {
-            if ($testimonial->avatar) {
-                Storage::disk('public')->delete($testimonial->avatar);
+            if ($request->hasFile('avatar')) {
+                $validated['avatar'] = $this->testimonialService->uploadAvatar($request->file('avatar'));
             }
-            $validated['avatar'] = $request->file('avatar')->store('testimonials', 'public');
-        }
 
-        $testimonial->update($validated);
+            $this->testimonialService->update($testimonial, $validated);
 
-        return redirect()->route('admin.testimonials.index')
-            ->with('success', 'Testimonial updated successfully.');
+            if ($request->hasFile('avatar') && $oldAvatar) {
+                $this->testimonialService->deleteAvatar($oldAvatar);
+            }
+        }, 'testimonial', 'admin.testimonials.index', ['testimonial_id' => $testimonial->id]);
     }
 
-    public function destroy(Testimonial $testimonial)
+    public function destroy(Testimonial $testimonial): RedirectResponse
     {
-        if ($testimonial->avatar) {
-            Storage::disk('public')->delete($testimonial->avatar);
-        }
-
-        $testimonial->delete();
-
-        return redirect()->route('admin.testimonials.index')
-            ->with('success', 'Testimonial deleted successfully.');
+        return $this->handleDelete(function () use ($testimonial) {
+            $avatarPath = $testimonial->avatar;
+            $this->testimonialService->delete($testimonial);
+            
+            if ($avatarPath) {
+                $this->testimonialService->deleteAvatar($avatarPath);
+            }
+        }, 'testimonial', 'admin.testimonials.index', ['testimonial_id' => $testimonial->id]);
     }
 }

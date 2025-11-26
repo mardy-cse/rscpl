@@ -2,57 +2,64 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
-class ProfileController extends Controller
+class ProfileController extends AdminController
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     /**
      * Show the profile edit form.
      */
-    public function edit()
+    public function edit(Request $request): View
     {
         return view('admin.profile.edit', [
-            'user' => auth()->user()
+            'user' => $request->user()
         ]);
     }
 
     /**
      * Update the profile information.
      */
-    public function update(Request $request)
+    public function update(Request $request): RedirectResponse
     {
-        $user = auth()->user();
+        $user = $request->user();
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
         ]);
 
-        $user->update($validated);
-
-        return redirect()->route('admin.profile.edit')
-            ->with('success', 'Profile updated successfully.');
+        return $this->handleUpdate(
+            fn() => $user->update($validated),
+            'profile',
+            'admin.profile.edit'
+        );
     }
 
     /**
      * Update the password.
      */
-    public function updatePassword(Request $request)
+    public function updatePassword(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'current_password' => ['required', 'current_password'],
             'password' => ['required', 'confirmed', Password::min(8)],
         ]);
 
-        $user = auth()->user();
-        $user->update([
-            'password' => Hash::make($validated['password'])
-        ]);
-
-        return redirect()->route('admin.profile.edit')
-            ->with('success', 'Password updated successfully.');
+        return $this->handleUpdate(
+            fn() => $request->user()->update([
+                'password' => Hash::make($validated['password'])
+            ]),
+            'password',
+            'admin.profile.edit'
+        );
     }
 }

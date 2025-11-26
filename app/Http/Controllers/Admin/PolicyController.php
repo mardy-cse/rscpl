@@ -2,16 +2,22 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Models\Policy;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 
-class PolicyController extends Controller
+class PolicyController extends AdminController
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     /**
      * Display list of policies
      */
-    public function index()
+    public function index(): View
     {
         $policies = Policy::all();
         return view('admin.policies.index', compact('policies'));
@@ -20,7 +26,7 @@ class PolicyController extends Controller
     /**
      * Show edit form for a policy
      */
-    public function edit($id)
+    public function edit(int $id): View
     {
         $policy = Policy::findOrFail($id);
         return view('admin.policies.edit', compact('policy'));
@@ -29,21 +35,20 @@ class PolicyController extends Controller
     /**
      * Update policy content
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id): RedirectResponse
     {
         $policy = Policy::findOrFail($id);
 
-        $request->validate([
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'content' => 'required|string',
+            'content' => 'required|string|max:1000000',
         ]);
 
-        $policy->update([
-            'title' => $request->title,
-            'content' => $request->content,
-        ]);
-
-        return redirect()->route('admin.policies.index')
-            ->with('success', 'Policy updated successfully!');
+        return $this->handleUpdate(
+            fn() => $policy->update($validated),
+            'policy',
+            'admin.policies.index',
+            ['policy_id' => $id]
+        );
     }
 }

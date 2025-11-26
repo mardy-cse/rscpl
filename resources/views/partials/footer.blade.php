@@ -206,8 +206,8 @@
                     &copy; {{ date('Y') }} HTR ENGINEERING PTE LTD. All rights reserved.
                 </p>
                 <div class="flex space-x-6">
-                    <a href="#" class="hover:text-primary-400 transition-colors">Privacy Policy</a>
-                    <a href="#" class="hover:text-primary-400 transition-colors">Terms of Service</a>
+                    <a href="{{ route('privacy-policy') }}" class="hover:text-primary-400 transition-colors">Privacy Policy</a>
+                    <a href="{{ route('terms-of-service') }}" class="hover:text-primary-400 transition-colors">Terms of Service</a>
                     <a href="{{ route('sitemap') }}" class="hover:text-primary-400 transition-colors">Sitemap</a>
                 </div>
             </div>
