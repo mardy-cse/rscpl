@@ -81,7 +81,7 @@
     @include('partials.footer')
     
     {{-- Floating WhatsApp Button --}}
-    <a href="https://wa.me/{{ App\Models\Setting::get('whatsapp', '6585445560') }}" 
+    <a href="https://wa.me/{{ setting('whatsapp', '6585445560') }}" 
        target="_blank" 
        rel="noopener noreferrer"
        class="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white rounded-full p-4 shadow-lg transition-all duration-300 hover:scale-110 z-50"
@@ -91,7 +91,65 @@
         </svg>
     </a>
     
+    {{-- Back to Top Button --}}
+    <button id="backToTop" 
+            class="fixed bottom-24 right-6 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-full p-4 shadow-2xl transition-all duration-300 opacity-0 invisible hover:scale-110 active:scale-95 z-40 group"
+            aria-label="Back to top"
+            title="Back to top">
+        <svg class="w-6 h-6 transform group-hover:-translate-y-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+        </svg>
+        <span class="absolute -top-10 right-0 bg-gray-900 text-white text-xs px-3 py-1 rounded shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+            Back to Top
+        </span>
+    </button>
+    
     {{-- Scripts --}}
+    <script>
+        // Back to top functionality with smooth animations
+        const backToTopButton = document.getElementById('backToTop');
+        let scrollTimeout;
+        
+        // Show/hide button on scroll with debounce
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                if (window.pageYOffset > 300) {
+                    backToTopButton.classList.remove('opacity-0', 'invisible');
+                    backToTopButton.classList.add('opacity-100', 'visible');
+                } else {
+                    backToTopButton.classList.add('opacity-0', 'invisible');
+                    backToTopButton.classList.remove('opacity-100', 'visible');
+                }
+            }, 100);
+        });
+        
+        // Scroll to top with smooth animation
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+            
+            // Add click animation feedback
+            backToTopButton.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                backToTopButton.style.transform = '';
+            }, 150);
+        });
+        
+        // Keyboard accessibility (Ctrl + Home)
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Home') {
+                e.preventDefault();
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    </script>
+    
     @stack('scripts')
     
     {{-- Structured Data (JSON-LD) --}}
@@ -105,19 +163,19 @@
         "description" => "Professional roller shutters, security grilles, automatic gates and doors installation services in Singapore.",
         "address" => [
             "@type" => "PostalAddress",
-            "streetAddress" => App\Models\Setting::get('address_line1', '105 Sims Avenue #05-11 Chancerlodge Complex'),
-            "addressLocality" => App\Models\Setting::get('city', 'Singapore'),
-            "postalCode" => App\Models\Setting::get('postal_code', '387429'),
+            "streetAddress" => setting('address_line1', '105 Sims Avenue #05-11 Chancerlodge Complex'),
+            "addressLocality" => setting('city', 'Singapore'),
+            "postalCode" => setting('postal_code', '387429'),
             "addressCountry" => "SG"
         ],
         "geo" => [
             "@type" => "GeoCoordinates",
-            "latitude" => (float) App\Models\Setting::get('latitude', '1.3274'),
-            "longitude" => (float) App\Models\Setting::get('longitude', '103.8779')
+            "latitude" => (float) setting('latitude', '1.3274'),
+            "longitude" => (float) setting('longitude', '103.8779')
         ],
         "url" => url('/'),
-        "telephone" => App\Models\Setting::get('phone', '+6585445560'),
-        "email" => App\Models\Setting::get('email', 'rollershutter14@gmail.com'),
+        "telephone" => setting('phone', '+6585445560'),
+        "email" => setting('email', 'rollershutter14@gmail.com'),
         "priceRange" => "$$",
         "openingHoursSpecification" => [
             [

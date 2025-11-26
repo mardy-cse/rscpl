@@ -52,7 +52,7 @@
                 </div>
                 @endif
 
-                @if($service->features && count($service->features) > 0)
+                @if($service->features && is_array($service->features) && count($service->features) > 0)
                 <div class="mb-8">
                     <h2 class="text-3xl font-bold text-gray-900 mb-6">Key Features & Benefits</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

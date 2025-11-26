@@ -54,7 +54,7 @@
                     </p>
 
                     {{-- Features --}}
-                    @if($service->features && count($service->features) > 0)
+                    @if($service->features && is_array($service->features) && count($service->features) > 0)
                     <div class="mb-6 space-y-2">
                         @foreach(array_slice($service->features, 0, 3) as $feature)
                         <div class="flex items-start gap-2">

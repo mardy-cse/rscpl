@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Contact Us - HTR ENGINEERING PTE LTD')
-@section('meta_description', 'Contact HTR ENGINEERING for professional installation services. Located at ' . App\Models\Setting::get('address_line1', '105 Sims Avenue, Singapore') . '. Call ' . App\Models\Setting::get('phone', '+65 8697 3181') . ' or email ' . App\Models\Setting::get('email', 'rollershutter14@gmail.com') . '.')
+@section('meta_description', 'Contact HTR ENGINEERING for professional installation services. Located at ' . setting('address_line1', '105 Sims Avenue, Singapore') . '. Call ' . setting('phone', '+65 8697 3181') . ' or email ' . setting('email', 'rollershutter14@gmail.com') . '.')
 
 @section('content')
 {{-- Page Header --}}
@@ -122,13 +122,32 @@
 
                     {{-- Submit Button --}}
                     <button type="submit" 
-                            class="w-full bg-primary-700 text-white px-6 py-4 rounded-lg font-bold text-lg hover:bg-primary-800 transition-colors flex items-center justify-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            id="contactSubmitBtn"
+                            class="w-full bg-primary-700 text-white px-6 py-4 rounded-lg font-bold text-lg hover:bg-primary-800 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg id="contactBtnIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                         </svg>
-                        Send Message
+                        <svg id="contactBtnSpinner" class="hidden animate-spin w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span id="contactBtnText">Send Message</span>
                     </button>
                 </form>
+                
+                <script>
+                document.querySelector('form').addEventListener('submit', function(e) {
+                    const btn = document.getElementById('contactSubmitBtn');
+                    const icon = document.getElementById('contactBtnIcon');
+                    const spinner = document.getElementById('contactBtnSpinner');
+                    const text = document.getElementById('contactBtnText');
+                    
+                    btn.disabled = true;
+                    icon.classList.add('hidden');
+                    spinner.classList.remove('hidden');
+                    text.textContent = 'Sending...';
+                });
+                </script>
             </div>
 
             {{-- Contact Information --}}
@@ -149,7 +168,7 @@
                             <div>
                                 <h3 class="font-bold text-gray-900 mb-1">Address</h3>
                                 <p class="text-gray-600">
-                                    {!! nl2br(e(App\Models\Setting::get('address', '105 Sims Avenue #05-11\nChancerlodge Complex\nSingapore 387429'))) !!}
+                                    {!! nl2br(e(setting('address', '105 Sims Avenue #05-11\nChancerlodge Complex\nSingapore 387429'))) !!}
                                 </p>
                             </div>
                         </div>
@@ -163,8 +182,8 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-gray-900 mb-1">Phone</h3>
-                                <a href="tel:{{ str_replace(' ', '', App\Models\Setting::get('phone', '+6585445560')) }}" class="text-primary-700 hover:text-primary-800 font-semibold">
-                                    {{ App\Models\Setting::get('phone', '+65 8697 3181') }}
+                                <a href="tel:{{ str_replace(' ', '', setting('phone', '+6585445560')) }}" class="text-primary-700 hover:text-primary-800 font-semibold">
+                                    {{ setting('phone', '+65 8697 3181') }}
                                 </a>
                             </div>
                         </div>
@@ -178,8 +197,8 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-gray-900 mb-1">Email</h3>
-                                <a href="mailto:{{ App\Models\Setting::get('email', 'rollershutter14@gmail.com') }}" class="text-primary-700 hover:text-primary-800 font-semibold break-all">
-                                    {{ App\Models\Setting::get('email', 'rollershutter14@gmail.com') }}
+                                <a href="mailto:{{ setting('email', 'rollershutter14@gmail.com') }}" class="text-primary-700 hover:text-primary-800 font-semibold break-all">
+                                    {{ setting('email', 'rollershutter14@gmail.com') }}
                                 </a>
                             </div>
                         </div>
@@ -194,7 +213,7 @@
                             <div>
                                 <h3 class="font-bold text-gray-900 mb-1">Business Hours</h3>
                                 <p class="text-gray-600">
-                                    {!! nl2br(e(App\Models\Setting::get('business_hours_detail', 'Mon - Fri: 9:00 AM - 6:00 PM\nSaturday: 9:00 AM - 1:00 PM\nSunday: Closed'))) !!}
+                                    {!! nl2br(e(setting('business_hours_detail', 'Mon - Fri: 9:00 AM - 6:00 PM\nSaturday: 9:00 AM - 1:00 PM\nSunday: Closed'))) !!}
                                 </p>
                             </div>
                         </div>
@@ -202,7 +221,7 @@
 
                     {{-- WhatsApp Button --}}
                     <div class="mt-8 pt-8 border-t border-gray-200">
-                        <a href="https://wa.me/{{ App\Models\Setting::get('whatsapp', '6585445560') }}" 
+                        <a href="https://wa.me/{{ setting('whatsapp', '6585445560') }}" 
                            target="_blank" 
                            rel="noopener noreferrer"
                            class="flex items-center justify-center gap-3 bg-green-500 hover:bg-green-600 text-white px-6 py-4 rounded-lg font-bold transition-colors">
