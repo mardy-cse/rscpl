@@ -16,7 +16,8 @@
         </div>
     @endif
 
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+    {{-- Desktop Table View --}}
+    <div class="hidden md:block bg-white rounded-lg shadow-md overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
@@ -109,6 +110,102 @@
                 </tbody>
             </table>
         </div>
+    </div>
+
+    {{-- Mobile Card View --}}
+    <div class="md:hidden space-y-4">
+        @forelse($testimonials as $testimonial)
+            <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                <div class="p-4">
+                    <div class="flex gap-4 items-start">
+                        @if($testimonial->avatar)
+                            <img src="{{ asset('storage/' . $testimonial->avatar) }}" 
+                                 alt="{{ $testimonial->name }}" 
+                                 class="h-16 w-16 rounded-full object-cover flex-shrink-0">
+                        @else
+                            <div class="h-16 w-16 rounded-full bg-gray-300 flex items-center justify-center flex-shrink-0">
+                                <span class="text-gray-600 font-semibold text-2xl">{{ substr($testimonial->name, 0, 1) }}</span>
+                            </div>
+                        @endif
+                        
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-lg font-semibold text-gray-900">{{ $testimonial->name }}</h3>
+                            <p class="text-sm text-gray-600">{{ $testimonial->company }}</p>
+                            <div class="flex items-center mt-1">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= $testimonial->rating)
+                                        <svg class="w-4 h-4 text-yellow-400 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                            <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                                        </svg>
+                                    @else
+                                        <svg class="w-4 h-4 text-gray-300 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                            <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                                        </svg>
+                                    @endif
+                                @endfor
+                                <span class="ml-2 text-sm text-gray-600">({{ $testimonial->rating }})</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
+                        <div>
+                            <span class="text-gray-500 font-medium">STATUS</span>
+                            <div class="mt-1">
+                                @if($testimonial->is_active)
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Active
+                                    </span>
+                                @else
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                        Inactive
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <span class="text-gray-500 font-medium">ORDER</span>
+                            <div class="mt-1 text-gray-700">{{ $testimonial->order }}</div>
+                        </div>
+                    </div>
+                    
+                    @if($testimonial->content)
+                        <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+                            <p class="text-sm text-gray-600 line-clamp-3">{{ $testimonial->content }}</p>
+                        </div>
+                    @endif
+                    
+                    <div class="mt-4 flex gap-3 pt-4 border-t border-gray-200">
+                        <a href="{{ route('admin.testimonials.edit', $testimonial) }}" 
+                           class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center font-semibold">
+                            <i class="fas fa-edit mr-2"></i>
+                            <span>Edit</span>
+                        </a>
+                        <form action="{{ route('admin.testimonials.destroy', $testimonial) }}" 
+                              method="POST" 
+                              class="flex-1"
+                              onsubmit="return confirm('Are you sure you want to delete this testimonial?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" 
+                                    class="w-full bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center font-semibold">
+                                <i class="fas fa-trash mr-2"></i>
+                                <span>Delete</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        @empty
+            <div class="bg-white shadow-md rounded-lg p-8 text-center text-gray-500">
+                <i class="fas fa-comments text-4xl mb-2"></i>
+                <p class="text-lg">No testimonials found.</p>
+                <a href="{{ route('admin.testimonials.create') }}" class="text-blue-600 hover:text-blue-800 mt-2 inline-block">
+                    Add your first testimonial
+                </a>
+            </div>
+        @endforelse
     </div>
 </div>
 @endsection

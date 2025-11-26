@@ -24,9 +24,9 @@ class StoreProjectRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:2000'],
-            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
-            'location' => ['nullable', 'string', 'max:255'],
-            'year' => ['nullable', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
+            'image' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'location' => ['required', 'string', 'in:Commercial,Industrial,Residential'],
+            'year' => ['required', 'integer', 'min:1900', 'max:' . (date('Y') + 10)],
             'status' => ['required', 'in:Planning,In Progress,Completed,On Hold'],
             'is_featured' => ['boolean'],
             'order' => ['nullable', 'integer', 'min:0'],
@@ -53,6 +53,9 @@ class StoreProjectRequest extends FormRequest
         return [
             'title.required' => 'Project title is required.',
             'description.required' => 'Project description is required.',
+            'location.required' => 'Project category is required.',
+            'location.in' => 'Invalid category selected.',
+            'year.required' => 'Project year is required.',
             'status.required' => 'Project status is required.',
             'status.in' => 'Invalid project status selected.',
             'year.min' => 'Year must be 1900 or later.',

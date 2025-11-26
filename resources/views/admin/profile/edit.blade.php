@@ -66,9 +66,9 @@
                 </div>
 
                 <button type="submit" 
-                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg shadow-md transition duration-200">
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-200 flex items-center justify-center">
                     <i class="fas fa-save mr-2"></i>
-                    Update Profile
+                    <span>Update Profile</span>
                 </button>
             </form>
         </div>
@@ -133,9 +133,9 @@
                 </div>
 
                 <button type="submit" 
-                        class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg shadow-md transition duration-200">
+                        class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-200 flex items-center justify-center">
                     <i class="fas fa-key mr-2"></i>
-                    Update Password
+                    <span>Update Password</span>
                 </button>
             </form>
         </div>

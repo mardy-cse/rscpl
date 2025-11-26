@@ -50,6 +50,43 @@ class AboutContentController extends AdminController
             ->with('success', 'About content updated successfully.');
     }
 
+    public function updateAll(Request $request)
+    {
+        $request->validate([
+            'sections' => 'required|array',
+            'sections.*.id' => 'required|exists:about_contents,id',
+            'sections.*.title' => 'required|string|max:255',
+            'sections.*.subtitle' => 'nullable|string|max:255',
+            'sections.*.content' => 'required|string',
+            'sections.*.image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+        ]);
+
+        foreach ($request->sections as $sectionId => $data) {
+            $aboutContent = AboutContent::findOrFail($data['id']);
+            
+            $updateData = [
+                'title' => $data['title'],
+                'subtitle' => $data['subtitle'] ?? null,
+                'content' => $data['content'],
+                'is_active' => isset($data['is_active']) ? 1 : 0,
+            ];
+
+            // Handle image upload
+            if ($request->hasFile("sections.{$sectionId}.image")) {
+                // Delete old image
+                if ($aboutContent->image) {
+                    Storage::disk('public')->delete($aboutContent->image);
+                }
+                $updateData['image'] = $request->file("sections.{$sectionId}.image")->store('about', 'public');
+            }
+
+            $aboutContent->update($updateData);
+        }
+
+        return redirect()->route('admin.about.index')
+            ->with('success', 'All about content updated successfully.');
+    }
+
     public function seed()
     {
         Artisan::call('db:seed', ['--class' => 'AboutContentSeeder']);

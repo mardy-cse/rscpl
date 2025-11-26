@@ -19,7 +19,8 @@
     </div>
 @endif
 
-<div class="bg-white rounded-lg shadow-md overflow-hidden">
+{{-- Desktop Table View --}}
+<div class="hidden md:block bg-white rounded-lg shadow-md overflow-hidden">
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
@@ -81,6 +82,50 @@
             </tbody>
         </table>
     </div>
+</div>
+
+{{-- Mobile Card View --}}
+<div class="md:hidden space-y-4">
+    @forelse($policies as $policy)
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="p-4">
+                <div class="mb-3">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                        {{ $policy->type === 'privacy_policy' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800' }}">
+                        <i class="fas {{ $policy->type === 'privacy_policy' ? 'fa-shield-alt' : 'fa-gavel' }} mr-2"></i>
+                        {{ $policy->type === 'privacy_policy' ? 'Privacy Policy' : 'Terms of Service' }}
+                    </span>
+                </div>
+
+                <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ $policy->title }}</h3>
+                <p class="text-sm text-gray-500 mb-3">{{ $policy->slug }}</p>
+
+                <div class="text-xs text-gray-500 mb-3">
+                    <i class="far fa-calendar-alt mr-1"></i>
+                    Last updated: {{ $policy->updated_at->format('M d, Y') }}
+                </div>
+
+                <div class="flex gap-3 pt-3 border-t border-gray-200">
+                    <a href="{{ route('admin.policies.edit', $policy->id) }}" 
+                       class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center font-semibold">
+                        <i class="fas fa-edit mr-2"></i>
+                        <span>Edit</span>
+                    </a>
+                    <a href="{{ $policy->type === 'privacy_policy' ? route('privacy-policy') : route('terms-of-service') }}" 
+                       target="_blank"
+                       class="flex-1 bg-green-600 hover:bg-green-700 text-white text-center py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center font-semibold">
+                        <i class="fas fa-external-link-alt mr-2"></i>
+                        <span>View</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    @empty
+        <div class="bg-white shadow-md rounded-lg p-8 text-center text-gray-500">
+            <i class="fas fa-file-contract text-4xl mb-2"></i>
+            <p class="text-lg">No policies found</p>
+        </div>
+    @endforelse
 </div>
 
 <!-- Info Box -->

@@ -12,7 +12,8 @@
         </div>
     @endif
 
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+    {{-- Desktop Table View --}}
+    <div class="hidden md:block bg-white rounded-lg shadow-md overflow-hidden">
         @if($contacts->count() > 0)
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
@@ -91,6 +92,71 @@
                 </svg>
                 <h3 class="mt-2 text-sm font-medium text-gray-900">No contact submissions</h3>
                 <p class="mt-1 text-sm text-gray-500">No contact submissions have been received yet.</p>
+            </div>
+        @endif
+    </div>
+
+    {{-- Mobile Card View --}}
+    <div class="md:hidden space-y-4">
+        @if($contacts->count() > 0)
+            @foreach($contacts as $contact)
+                <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex-1">
+                                <h3 class="text-lg font-semibold text-gray-900">{{ $contact->name }}</h3>
+                                <p class="text-sm text-gray-600 mt-1">
+                                    <i class="fas fa-envelope mr-1"></i>{{ $contact->email }}
+                                </p>
+                                @if($contact->phone)
+                                    <p class="text-sm text-gray-600 mt-1">
+                                        <i class="fas fa-phone mr-1"></i>{{ $contact->phone }}
+                                    </p>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <p class="text-sm font-medium text-gray-500">SUBJECT</p>
+                            <p class="text-sm text-gray-900 mt-1">{{ $contact->subject }}</p>
+                        </div>
+
+                        <div class="text-xs text-gray-500 mb-3">
+                            <i class="far fa-clock mr-1"></i>
+                            {{ $contact->created_at->format('M d, Y') }} at {{ $contact->created_at->format('h:i A') }}
+                        </div>
+
+                        <div class="flex gap-3 pt-3 border-t border-gray-200">
+                            <a href="{{ route('admin.contacts.show', $contact) }}" 
+                               class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center font-semibold">
+                                <i class="fas fa-eye mr-2"></i>
+                                <span>View</span>
+                            </a>
+                            <form action="{{ route('admin.contacts.destroy', $contact) }}" 
+                                  method="POST" 
+                                  class="flex-1"
+                                  onsubmit="return confirm('Are you sure you want to delete this contact submission?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" 
+                                        class="w-full bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center font-semibold">
+                                    <i class="fas fa-trash mr-2"></i>
+                                    <span>Delete</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+
+            <div class="mt-4">
+                {{ $contacts->links() }}
+            </div>
+        @else
+            <div class="bg-white shadow-md rounded-lg p-8 text-center text-gray-500">
+                <i class="fas fa-envelope-open text-4xl mb-2"></i>
+                <p class="text-lg">No contact submissions</p>
+                <p class="text-sm mt-1">No contact submissions have been received yet.</p>
             </div>
         @endif
     </div>

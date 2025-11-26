@@ -4,6 +4,18 @@ namespace App\Http\Requests;
 
 class UpdateProjectRequest extends StoreProjectRequest
 {
-    // Inherits all rules and methods from StoreProjectRequest
-    // Can override specific methods if needed
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        $rules = parent::rules();
+        
+        // Make image optional for updates
+        $rules['image'] = ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'];
+        
+        return $rules;
+    }
 }

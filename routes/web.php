@@ -66,6 +66,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
     Route::get('about-content', [AboutContentController::class, 'index'])->name('about.index');
     Route::get('about-content/{aboutContent}/edit', [AboutContentController::class, 'edit'])->name('about.edit');
     Route::put('about-content/{aboutContent}', [AboutContentController::class, 'update'])->name('about.update');
+    Route::put('about-content-all', [AboutContentController::class, 'updateAll'])->name('about.update-all');
     Route::post('about-content/seed', [AboutContentController::class, 'seed'])->name('about.seed');
     
     // Contacts
