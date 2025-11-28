@@ -85,13 +85,13 @@
             <div id="servicesSlider" class="grid gap-8 transition-all duration-500">
                 {{-- Services will be rendered by JavaScript slider --}}
             </div>
-            {{-- Navigation Arrows (shown only when items > 3) --}}
-            <button id="servicesSlider-prev" class="hidden absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white/90 hover:bg-white text-primary-900 p-3 rounded-full shadow-lg hover:shadow-xl transition-all z-10">
+            {{-- Navigation Arrows - Hidden on Mobile --}}
+            <button id="servicesSlider-prev" class="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white/90 hover:bg-white text-primary-900 p-3 rounded-full shadow-lg hover:shadow-xl transition-all z-10">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
             </button>
-            <button id="servicesSlider-next" class="hidden absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white/90 hover:bg-white text-primary-900 p-3 rounded-full shadow-lg hover:shadow-xl transition-all z-10">
+            <button id="servicesSlider-next" class="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white/90 hover:bg-white text-primary-900 p-3 rounded-full shadow-lg hover:shadow-xl transition-all z-10">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                 </svg>
@@ -120,13 +120,13 @@
             <div id="projectsSlider" class="grid gap-8">
                 {{-- Projects will be rendered by JavaScript slider --}}
             </div>
-            {{-- Navigation Arrows --}}
-            <button id="projectsSlider-prev" class="hidden absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white/90 hover:bg-white text-primary-900 p-3 rounded-full shadow-lg hover:shadow-xl transition-all z-10">
+            {{-- Navigation Arrows - Hidden on Mobile --}}
+            <button id="projectsSlider-prev" class="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white/90 hover:bg-white text-primary-900 p-3 rounded-full shadow-lg hover:shadow-xl transition-all z-10">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
             </button>
-            <button id="projectsSlider-next" class="hidden absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white/90 hover:bg-white text-primary-900 p-3 rounded-full shadow-lg hover:shadow-xl transition-all z-10">
+            <button id="projectsSlider-next" class="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white/90 hover:bg-white text-primary-900 p-3 rounded-full shadow-lg hover:shadow-xl transition-all z-10">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                 </svg>
@@ -155,13 +155,13 @@
             <div id="testimonialsSlider" class="grid gap-8 max-w-6xl mx-auto">
                 {{-- Testimonials will be rendered by JavaScript slider --}}
             </div>
-            {{-- Navigation Arrows --}}
-            <button id="testimonialsSlider-prev" class="hidden absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white hover:bg-gray-50 text-gray-900 p-3 rounded-full shadow-lg hover:shadow-xl transition-all z-10">
+            {{-- Navigation Arrows - Hidden on Mobile --}}
+            <button id="testimonialsSlider-prev" class="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white hover:bg-gray-50 text-gray-900 p-3 rounded-full shadow-lg hover:shadow-xl transition-all z-10">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
             </button>
-            <button id="testimonialsSlider-next" class="hidden absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white hover:bg-gray-50 text-gray-900 p-3 rounded-full shadow-lg hover:shadow-xl transition-all z-10">
+            <button id="testimonialsSlider-next" class="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white hover:bg-gray-50 text-gray-900 p-3 rounded-full shadow-lg hover:shadow-xl transition-all z-10">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                 </svg>
@@ -214,32 +214,68 @@ document.addEventListener('DOMContentLoaded', function() {
         // Show only available items (max 3)
         const itemsPerPage = Math.min(3, items.length);
 
-        // Set grid layout based on number of items to display
-        if (itemsPerPage === 1) {
-            container.className = 'grid grid-cols-1 gap-8 transition-all duration-500 max-w-md mx-auto';
-        } else if (itemsPerPage === 2) {
-            container.className = 'grid grid-cols-1 md:grid-cols-2 gap-8 transition-all duration-500 max-w-4xl mx-auto';
+        // Set responsive layout - mobile horizontal scroll, desktop grid
+        const isMobile = window.innerWidth < 768;
+        
+        if (isMobile) {
+            container.className = 'flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4';
         } else {
-            container.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 transition-all duration-500';
+            container.className = 'grid gap-8 transition-all duration-500 md:grid-cols-2 lg:grid-cols-3';
+        }
+        
+        // Add mobile-specific styles
+        if (!document.querySelector('#mobile-slider-style')) {
+            const style = document.createElement('style');
+            style.id = 'mobile-slider-style';
+            style.textContent = `
+                .scrollbar-hide {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                }
+                .scrollbar-hide::-webkit-scrollbar {
+                    display: none;
+                }
+                @media (max-width: 767px) {
+                    .slider-item {
+                        flex: 0 0 280px;
+                        scroll-snap-align: start;
+                        scroll-snap-stop: always;
+                    }
+                    .slider-container {
+                        padding-left: 1rem;
+                        padding-right: 1rem;
+                    }
+                }
+                @media (min-width: 768px) {
+                    .slider-item {
+                        flex: none;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
         }
 
         function renderItems(startIndex) {
-            // Wrap around if needed, but only if we have more than itemsPerPage
-            const displayItems = [];
-            if (items.length <= itemsPerPage) {
-                // Show all items if total is less than or equal to itemsPerPage
-                displayItems.push(...items);
-            } else {
-                // Circular sliding for more items
-                for (let i = 0; i < itemsPerPage; i++) {
-                    const index = (startIndex + i) % items.length;
-                    displayItems.push(items[index]);
+            // For mobile: show all items in horizontal scroll
+            // For desktop: show limited items with pagination
+            const isMobile = window.innerWidth < 768;
+            const displayItems = isMobile ? items : [];
+            
+            if (!isMobile) {
+                // Desktop behavior: limited items with pagination
+                if (items.length <= itemsPerPage) {
+                    displayItems.push(...items);
+                } else {
+                    for (let i = 0; i < itemsPerPage; i++) {
+                        const index = (startIndex + i) % items.length;
+                        displayItems.push(items[index]);
+                    }
                 }
             }
             
             if (type === 'service') {
                 container.innerHTML = displayItems.map(service => `
-                    <a href="/service/${service.id}" class="group relative bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 block">
+                    <a href="/service/${service.id}" class="slider-item group relative bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 block">
                         ${service.image ? `
                             <div class="absolute inset-0 z-0">
                                 <img src="${imageUrl(service.image)}" 
@@ -273,7 +309,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 `).join('');
             } else if (type === 'project') {
                 container.innerHTML = displayItems.map(project => `
-                    <a href="/project/${project.id}" class="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
+                    <a href="/project/${project.id}" class="slider-item group relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
                         <div class="aspect-w-16 aspect-h-12 bg-gray-200">
                             ${project.image ? `
                                 <img src="${imageUrl(project.image)}" 
@@ -302,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 `).join('');
             } else if (type === 'testimonial') {
                 container.innerHTML = displayItems.map(testimonial => `
-                    <div class="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow">
+                    <div class="slider-item bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow">
                         <div class="flex gap-1 mb-4">
                             ${Array(parseInt(testimonial.rating)).fill().map(() => `
                                 <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
@@ -359,8 +395,9 @@ document.addEventListener('DOMContentLoaded', function() {
         renderItems(currentIndex);
 
         // Show/hide navigation arrows and setup auto-slide
-        if (items.length > itemsPerPage) {
-            // Show navigation arrows
+        const isMobile = window.innerWidth < 768;
+        if (items.length > itemsPerPage && !isMobile) {
+            // Show navigation arrows only on desktop
             const prevBtn = document.getElementById(`${containerId}-prev`);
             const nextBtn = document.getElementById(`${containerId}-next`);
             
