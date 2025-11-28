@@ -201,6 +201,26 @@
 <style>
 .slider-container {
     position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 60px;
+}
+
+.slider-wrapper {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+}
+
+.slider-track {
+    display: flex;
+    transition: transform 0.5s ease;
+    gap: 24px;
+}
+
+.slider-card {
+    flex: 0 0 calc(33.333% - 16px);
+    min-width: 350px;
 }
 
 .slider-arrows {
@@ -208,26 +228,52 @@
     top: 50%;
     transform: translateY(-50%);
     z-index: 10;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
-    border: none;
-    cursor: pointer;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.slider-arrows:hover {
+    background: white;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
 .slider-arrows.prev {
-    left: -24px;
+    left: 10px;
 }
 
 .slider-arrows.next {
-    right: -24px;
+    right: 10px;
 }
 
-.slider-wrapper {
-    overflow: hidden;
-    position: relative;
+.slider-arrows svg {
+    width: 20px;
+    height: 20px;
+    color: #374151;
+}
+
+@media (max-width: 768px) {
+    .slider-container {
+        padding: 0 20px;
+    }
+    
+    .slider-card {
+        flex: 0 0 280px;
+        min-width: 280px;
+    }
+    
+    .slider-arrows {
+        display: none;
+    }
+}
 }
 
 .slider-track {
@@ -261,7 +307,7 @@
 {{-- Auto Slider JavaScript --}}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Simple helper functions
+    // Helper functions
     function escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text || '';
@@ -273,187 +319,160 @@ document.addEventListener('DOMContentLoaded', function() {
         return '{{ url('') }}/uploads/' + path;
     }
 
-    // Slider class
-    class Slider {
-        constructor(containerId, data, type) {
-            this.containerId = containerId;
-            this.data = data;
-            this.type = type;
-            this.currentIndex = 0;
-            this.container = document.getElementById(containerId);
-            this.prevBtn = document.getElementById(`${containerId}-prev`);
-            this.nextBtn = document.getElementById(`${containerId}-next`);
-            
-            if (!this.container || !this.data || this.data.length === 0) return;
-            
-            this.init();
-        }
-        
-        init() {
-            this.render();
-            this.bindEvents();
-            this.startAutoSlide();
-        }
-        
-        render() {
-            this.container.innerHTML = this.data.map(item => this.getCardHtml(item)).join('');
-            this.updateSliderPosition();
-        }
-        
-        getCardHtml(item) {
-            if (this.type === 'service') {
-                return `
-                    <div class="slider-card group relative bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
-                        ${item.image ? `
-                            <div class="absolute inset-0 z-0">
-                                <img src="${imageUrl(item.image)}" 
-                                     alt="${escapeHtml(item.title)}" 
-                                     class="w-full h-full object-cover">
-                                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/75 to-black/40"></div>
-                            </div>
-                        ` : `
-                            <div class="absolute inset-0 z-0 bg-gradient-to-br from-blue-700 to-blue-900"></div>
-                        `}
-                        <div class="relative z-10 p-6 flex flex-col h-full min-h-[320px]">
-                            <div class="mb-4">
-                                <div class="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                    <i class="${item.icon || 'fas fa-cog'} text-4xl text-white"></i>
-                                </div>
-                            </div>
-                            <div class="flex-grow">
-                                <h3 class="text-2xl font-bold text-white mb-3">${escapeHtml(item.title)}</h3>
-                                <p class="text-gray-200 text-sm leading-relaxed mb-4">${escapeHtml(item.description)}</p>
-                            </div>
-                            <div class="pt-4 border-t border-white/20">
-                                <span class="text-white font-semibold group-hover:text-blue-300 transition-colors inline-flex items-center">
-                                    Learn More
-                                    <svg class="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                                    </svg>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            } else if (this.type === 'project') {
-                return `
-                    <div class="slider-card group relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
-                        <div class="aspect-w-16 aspect-h-12 bg-gray-200">
-                            ${item.image ? `
-                                <img src="${imageUrl(item.image)}" 
-                                     alt="${escapeHtml(item.title)}" 
-                                     class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500">
-                            ` : `
-                                <div class="w-full h-64 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
-                                    <span class="text-4xl text-blue-400 font-bold">${escapeHtml(item.title.charAt(0))}</span>
-                                </div>
-                            `}
-                        </div>
-                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        <div class="absolute bottom-0 left-0 right-0 p-6 text-white transform translate-y-6 group-hover:translate-y-0 transition-transform duration-300">
-                            <span class="inline-block bg-blue-600 px-3 py-1 rounded-full text-xs font-semibold mb-2">
-                                ${escapeHtml(item.category)}
-                            </span>
-                            <h3 class="text-xl font-bold mb-2">${escapeHtml(item.title)}</h3>
-                            <p class="text-sm text-gray-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
-                                ${escapeHtml(item.description)}
-                            </p>
-                        </div>
-                    </div>
-                `;
-            } else if (this.type === 'testimonial') {
-                return `
-                    <div class="slider-card bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow">
-                        <div class="flex gap-1 mb-4">
-                            ${Array(parseInt(item.rating || 5)).fill().map(() => `
-                                <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                </svg>
-                            `).join('')}
-                        </div>
-                        <p class="text-gray-600 mb-6 italic">"${escapeHtml(item.message)}"</p>
-                        <div class="flex items-center gap-4">
-                            ${item.avatar ? `
-                                <img src="${imageUrl(item.avatar)}" 
-                                     alt="${escapeHtml(item.name)}" 
-                                     class="w-12 h-12 rounded-full object-cover">
-                            ` : `
-                                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg">
-                                    ${escapeHtml(item.name.charAt(0))}
-                                </div>
-                            `}
-                            <div>
-                                <div class="font-bold text-gray-900">${escapeHtml(item.name)}</div>
-                                <div class="text-sm text-gray-500">${escapeHtml(item.company)}</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-        }
-        
-        updateSliderPosition() {
-            const cardWidth = window.innerWidth < 768 ? 296 : 366; // card width + margin
-            const translateX = -this.currentIndex * cardWidth;
-            this.container.style.transform = `translateX(${translateX}px)`;
-        }
-        
-        next() {
-            this.currentIndex = (this.currentIndex + 1) % this.data.length;
-            this.updateSliderPosition();
-        }
-        
-        prev() {
-            this.currentIndex = (this.currentIndex - 1 + this.data.length) % this.data.length;
-            this.updateSliderPosition();
-        }
-        
-        bindEvents() {
-            if (this.prevBtn) {
-                this.prevBtn.addEventListener('click', () => {
-                    this.prev();
-                    this.resetAutoSlide();
-                });
-            }
-            
-            if (this.nextBtn) {
-                this.nextBtn.addEventListener('click', () => {
-                    this.next();
-                    this.resetAutoSlide();
-                });
-            }
-        }
-        
-        startAutoSlide() {
-            if (this.data.length > 1) {
-                this.autoSlideInterval = setInterval(() => {
-                    this.next();
-                }, 4000);
-            }
-        }
-        
-        resetAutoSlide() {
-            if (this.autoSlideInterval) {
-                clearInterval(this.autoSlideInterval);
-                this.startAutoSlide();
-            }
-        }
-    }
-
-    // Initialize sliders
+    // Services Slider Implementation
     const servicesData = @json($services);
-    if (servicesData && servicesData.length > 0) {
-        new Slider('servicesSlider', servicesData, 'service');
+    const servicesContainer = document.getElementById('servicesSlider');
+    
+    if (servicesContainer && servicesData && servicesData.length > 0) {
+        let currentIndex = 0;
+        const maxVisible = 3;
+        
+        // Render service cards
+        function renderServices() {
+            servicesContainer.innerHTML = servicesData.map(service => `
+                <div class="slider-card group relative bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+                    ${service.image ? `
+                        <div class="absolute inset-0 z-0">
+                            <img src="${imageUrl(service.image)}" 
+                                 alt="${escapeHtml(service.title)}" 
+                                 class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/75 to-black/40"></div>
+                        </div>
+                    ` : `
+                        <div class="absolute inset-0 z-0 bg-gradient-to-br from-blue-700 to-blue-900"></div>
+                    `}
+                    <div class="relative z-10 p-6 flex flex-col h-full min-h-[320px]">
+                        <div class="mb-4">
+                            <div class="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                <i class="${service.icon || 'fas fa-cog'} text-4xl text-white"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow">
+                            <h3 class="text-2xl font-bold text-white mb-3">${escapeHtml(service.title)}</h3>
+                            <p class="text-gray-200 text-sm leading-relaxed mb-4">${escapeHtml(service.description)}</p>
+                        </div>
+                        <div class="pt-4 border-t border-white/20">
+                            <span class="text-white font-semibold group-hover:text-blue-300 transition-colors inline-flex items-center">
+                                Learn More
+                                <svg class="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function updateSliderPosition() {
+            const translateX = -(currentIndex * (100 / maxVisible));
+            servicesContainer.style.transform = `translateX(${translateX}%)`;
+        }
+
+        // Navigation
+        const prevBtn = document.getElementById('servicesSlider-prev');
+        const nextBtn = document.getElementById('servicesSlider-next');
+        
+        if (prevBtn && nextBtn) {
+            prevBtn.addEventListener('click', function() {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    updateSliderPosition();
+                }
+            });
+            
+            nextBtn.addEventListener('click', function() {
+                if (currentIndex < servicesData.length - maxVisible) {
+                    currentIndex++;
+                    updateSliderPosition();
+                }
+            });
+            
+            // Hide arrows if not enough cards
+            if (servicesData.length <= maxVisible) {
+                prevBtn.style.display = 'none';
+                nextBtn.style.display = 'none';
+            }
+        }
+
+        // Auto slide
+        if (servicesData.length > maxVisible) {
+            setInterval(function() {
+                if (currentIndex >= servicesData.length - maxVisible) {
+                    currentIndex = 0;
+                } else {
+                    currentIndex++;
+                }
+                updateSliderPosition();
+            }, 4000);
+        }
+
+        // Initialize
+        renderServices();
     }
 
+    // Projects Slider - Simple Version
     const projectsData = @json($projects);
-    if (projectsData && projectsData.length > 0) {
-        new Slider('projectsSlider', projectsData, 'project');
+    const projectsContainer = document.getElementById('projectsSlider');
+    
+    if (projectsContainer && projectsData && projectsData.length > 0) {
+        projectsContainer.innerHTML = projectsData.slice(0, 3).map(project => `
+            <div class="slider-card group relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+                ${project.image ? `
+                    <img src="${imageUrl(project.image)}" 
+                         alt="${escapeHtml(project.title)}" 
+                         class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500">
+                ` : `
+                    <div class="w-full h-64 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
+                        <span class="text-4xl text-blue-400 font-bold">${escapeHtml(project.title.charAt(0))}</span>
+                    </div>
+                `}
+                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div class="absolute bottom-0 left-0 right-0 p-6 text-white transform translate-y-6 group-hover:translate-y-0 transition-transform duration-300">
+                    <span class="inline-block bg-blue-600 px-3 py-1 rounded-full text-xs font-semibold mb-2">
+                        ${escapeHtml(project.category)}
+                    </span>
+                    <h3 class="text-xl font-bold mb-2">${escapeHtml(project.title)}</h3>
+                    <p class="text-sm text-gray-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
+                        ${escapeHtml(project.description)}
+                    </p>
+                </div>
+            </div>
+        `).join('');
     }
 
+    // Testimonials Slider - Simple Version
     const testimonialsData = @json($testimonials);
-    if (testimonialsData && testimonialsData.length > 0) {
-        new Slider('testimonialsSlider', testimonialsData, 'testimonial');
+    const testimonialsContainer = document.getElementById('testimonialsSlider');
+    
+    if (testimonialsContainer && testimonialsData && testimonialsData.length > 0) {
+        testimonialsContainer.innerHTML = testimonialsData.slice(0, 3).map(testimonial => `
+            <div class="slider-card bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow">
+                <div class="flex gap-1 mb-4">
+                    ${Array(parseInt(testimonial.rating || 5)).fill().map(() => `
+                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                    `).join('')}
+                </div>
+                <p class="text-gray-600 mb-6 italic">"${escapeHtml(testimonial.message)}"</p>
+                <div class="flex items-center gap-4">
+                    ${testimonial.avatar ? `
+                        <img src="${imageUrl(testimonial.avatar)}" 
+                             alt="${escapeHtml(testimonial.name)}" 
+                             class="w-12 h-12 rounded-full object-cover">
+                    ` : `
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg">
+                            ${escapeHtml(testimonial.name.charAt(0))}
+                        </div>
+                    `}
+                    <div>
+                        <div class="font-bold text-gray-900">${escapeHtml(testimonial.name)}</div>
+                        <div class="text-sm text-gray-500">${escapeHtml(testimonial.company)}</div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
     }
 });
 </script>
