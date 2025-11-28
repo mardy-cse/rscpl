@@ -211,17 +211,24 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!container || !items || items.length === 0) return;
 
         let currentIndex = 0;
-        // Show only available items (max 3)
         const itemsPerPage = Math.min(3, items.length);
 
-        // Set responsive layout - mobile horizontal scroll, desktop grid
-        const isMobile = window.innerWidth < 768;
-        
-        if (isMobile) {
-            container.className = 'flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4';
-        } else {
-            container.className = 'grid gap-8 transition-all duration-500 md:grid-cols-2 lg:grid-cols-3';
+        // Set responsive layout
+        function setContainerLayout() {
+            const isMobile = window.innerWidth < 768;
+            
+            if (isMobile) {
+                container.className = 'flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4';
+            } else if (itemsPerPage === 1) {
+                container.className = 'grid grid-cols-1 gap-8 transition-all duration-500 max-w-md mx-auto';
+            } else if (itemsPerPage === 2) {
+                container.className = 'grid grid-cols-1 md:grid-cols-2 gap-8 transition-all duration-500 max-w-4xl mx-auto';
+            } else {
+                container.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 transition-all duration-500';
+            }
         }
+        
+        setContainerLayout();
         
         // Add mobile-specific styles
         if (!document.querySelector('#mobile-slider-style')) {
@@ -256,15 +263,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         function renderItems(startIndex) {
-            // For mobile: show all items in horizontal scroll
-            // For desktop: show limited items with pagination
             const isMobile = window.innerWidth < 768;
-            const displayItems = isMobile ? items : [];
+            let displayItems = [];
             
-            if (!isMobile) {
-                // Desktop behavior: limited items with pagination
+            if (isMobile) {
+                // Mobile: show all items
+                displayItems = [...items];
+            } else {
+                // Desktop: show limited items with pagination
                 if (items.length <= itemsPerPage) {
-                    displayItems.push(...items);
+                    displayItems = [...items];
                 } else {
                     for (let i = 0; i < itemsPerPage; i++) {
                         const index = (startIndex + i) % items.length;
@@ -393,6 +401,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Initial render
         renderItems(currentIndex);
+
+        // Navigation functions
+        function nextSlide() {
+            currentIndex = (currentIndex + 1) % items.length;
+            renderItems(currentIndex);
+        }
+
+        function prevSlide() {
+            currentIndex = (currentIndex - 1 + items.length) % items.length;
+            renderItems(currentIndex);
+        }
 
         // Show/hide navigation arrows and setup auto-slide
         const isMobile = window.innerWidth < 768;
