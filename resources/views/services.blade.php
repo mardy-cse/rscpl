@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Our Services - HTR ENGINEERING PTE LTD')
-@section('meta_description', 'Professional roller shutters, security grilles, automatic gates, automatic doors, metal fabrication and maintenance services in Singapore. Quality installations with warranty.')
+@section('title', 'Roller Shutters Services Singapore | Security Grilles | Automatic Gates Installation')
+@section('meta_description', '✓ Roller Shutters Installation ✓ Security Grilles ✓ Automatic Gates ✓ Doors ✓ Repair & Maintenance | Singapore | Free Quote +65 8544 5560 | Same Day Service')
 
 @section('content')
 {{-- Page Header --}}

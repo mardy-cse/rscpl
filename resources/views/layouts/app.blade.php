@@ -6,9 +6,9 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     
     {{-- SEO Meta Tags --}}
-    <title>@yield('title', 'HTR ENGINEERING PTE LTD - Singapore')</title>
-    <meta name="description" content="@yield('meta_description', 'Professional roller shutters, security grilles, automatic gates and doors in Singapore. Quality construction services with over 15 years of experience.')">
-    <meta name="keywords" content="roller shutters singapore, security grilles, automatic gates, automatic doors, metal works, construction singapore">
+    <title>@yield('title', 'Roller Shutters Singapore | Security Grilles & Automatic Gates | HTR Engineering')</title>
+    <meta name="description" content="@yield('meta_description', 'Professional roller shutters Singapore, security grilles, automatic gates & doors installation. 15+ years experience. Free quotation. Call +65 8544 5560. Trusted by 500+ clients.')"
+    <meta name="keywords" content="roller shutters singapore, security grilles singapore, automatic gates singapore, automatic doors singapore, roller shutter installation, security grille installation, commercial roller shutters, residential roller shutters, industrial roller shutters, motorized roller shutters, manual roller shutters, aluminium roller shutters, steel roller shutters, fire rated roller shutters, roller shutter repair, roller shutter maintenance, roller shutter supplier, roller shutter contractor, HTR engineering, metal works singapore, construction singapore, warehouse roller shutters, shop roller shutters, factory roller shutters">
     <meta name="author" content="HTR ENGINEERING PTE LTD">
     <link rel="canonical" href="@yield('canonical', url()->current())">
     
@@ -45,6 +45,92 @@
     
     {{-- FontAwesome Icons --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    {{-- Structured Data (JSON-LD) for SEO --}}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "HTR Engineering Pte Ltd",
+        "image": "{{ asset('images/logo.png') }}",
+        "@id": "https://rollershuttersingapore.com/",
+        "url": "https://rollershuttersingapore.com/",
+        "telephone": "+65 8544 5560",
+        "email": "info@htrengineering.com",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Singapore",
+            "addressLocality": "Singapore",
+            "addressCountry": "SG"
+        },
+        "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 1.3521,
+            "longitude": 103.8198
+        },
+        "openingHoursSpecification": {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": [
+                "Monday",
+                "Tuesday", 
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday"
+            ],
+            "opens": "08:00",
+            "closes": "18:00"
+        },
+        "sameAs": [
+            "https://www.facebook.com/htrengineering",
+            "https://www.linkedin.com/company/htr-engineering"
+        ],
+        "priceRange": "$$",
+        "description": "Professional roller shutters, security grilles, automatic gates and doors installation in Singapore. 15+ years experience with 500+ satisfied clients.",
+        "serviceArea": {
+            "@type": "Place",
+            "name": "Singapore"
+        },
+        "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Roller Shutters & Security Solutions",
+            "itemListElement": [
+                {
+                    "@type": "Offer",
+                    "itemOffered": {
+                        "@type": "Service",
+                        "name": "Roller Shutters Installation Singapore",
+                        "description": "Commercial and residential roller shutters installation, repair and maintenance services"
+                    }
+                },
+                {
+                    "@type": "Offer",
+                    "itemOffered": {
+                        "@type": "Service",
+                        "name": "Security Grilles Singapore",
+                        "description": "High-quality security grilles for residential and commercial properties"
+                    }
+                },
+                {
+                    "@type": "Offer",
+                    "itemOffered": {
+                        "@type": "Service",
+                        "name": "Automatic Gates Singapore",
+                        "description": "Automated gate systems with remote access control for enhanced security"
+                    }
+                },
+                {
+                    "@type": "Offer",
+                    "itemOffered": {
+                        "@type": "Service",
+                        "name": "Automatic Doors Singapore",
+                        "description": "Modern automatic door solutions for commercial buildings and retail spaces"
+                    }
+                }
+            ]
+        }
+    }
+    </script>
     
     {{-- Tailwind Custom Configuration --}}
     <script>

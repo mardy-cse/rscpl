@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Home - HTR ENGINEERING PTE LTD Singapore')
-@section('meta_description', 'Professional roller shutters, security grilles, automatic gates & doors in Singapore. Quality construction services with over 15 years of experience. Contact us at +65 8544 5560.')
+@section('title', 'Roller Shutters Singapore | #1 Security Grilles & Automatic Gates | HTR Engineering')
+@section('meta_description', '⭐ #1 Roller Shutters Singapore | Security Grilles & Automatic Gates Installation | 15+ Years | 500+ Happy Clients | Free Quote +65 8544 5560 | Same Day Service Available')
 
 @section('content')
 {{-- Hero Section --}}
@@ -12,10 +12,10 @@
     <div class="container mx-auto px-4 py-20 md:py-32 relative z-10">
         <div class="max-w-4xl">
             <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-                Premium Roller Shutters & <span class="text-primary-300">Security Solutions</span> in Singapore
+                #1 Roller Shutters Singapore | <span class="text-primary-300">Security Grilles & Automatic Gates</span> Installation
             </h1>
             <p class="text-xl md:text-2xl mb-8 text-gray-200">
-                Quality construction services with over 15 years of experience. We specialize in roller shutters, security grilles, automatic gates, and more.
+                ⭐ Singapore's Leading Roller Shutter Specialist | 15+ Years Experience | 500+ Happy Clients | Commercial & Residential Installation, Repair & Maintenance Services
             </p>
             <div class="flex flex-col sm:flex-row gap-4">
                 <a href="{{ route('contact') }}" class="bg-white text-primary-900 px-8 py-4 rounded-lg font-bold text-lg hover:bg-primary-50 transition-all duration-300 text-center shadow-xl hover:shadow-2xl transform hover:-translate-y-1">

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'About Us - HTR ENGINEERING PTE LTD')
-@section('meta_description', 'Learn about HTR ENGINEERING PTE LTD - Over 15 years of experience providing quality roller shutters, security solutions, and construction services in Singapore.')
+@section('title', 'About HTR Engineering | Leading Roller Shutters Singapore Company | 15+ Years Experience')
+@section('meta_description', 'About HTR Engineering - Singapore\'s trusted roller shutters, security grilles & automatic gates specialist since 2009. 500+ projects completed. Licensed & insured contractor.')
 
 @section('content')
 {{-- Page Header --}}

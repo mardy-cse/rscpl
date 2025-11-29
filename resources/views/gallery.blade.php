@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Gallery - Our Projects | HTR ENGINEERING PTE LTD')
-@section('meta_description', 'View our portfolio of completed roller shutter, security grilles, automatic gates installations across commercial, industrial and residential projects in Singapore.')
+@section('title', 'Roller Shutters Gallery Singapore | Completed Projects Portfolio | HTR Engineering')
+@section('meta_description', '500+ Completed Projects Gallery | Roller Shutters Singapore | Security Grilles | Automatic Gates | Commercial, Industrial & Residential Installations | View Our Work')
 
 @section('content')
 {{-- Page Header --}}

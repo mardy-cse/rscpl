@@ -2,5 +2,12 @@ User-agent: *
 Disallow: /admin
 Disallow: /login
 Disallow: /register
+Disallow: /storage
+Disallow: /vendor
+Allow: /
 
-Sitemap: http://localhost:8000/sitemap.xml
+# Sitemap location
+Sitemap: https://rollershuttersingapore.com/sitemap.xml
+
+# Crawl-delay for better server performance
+Crawl-delay: 1
