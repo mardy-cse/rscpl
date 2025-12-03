@@ -339,6 +339,13 @@ document.addEventListener('DOMContentLoaded', function() {
         let currentIndex = 0;
         let maxVisible = getVisibleCards();
         let autoSlideInterval;
+        
+        // Touch/Swipe variables
+        let touchStartX = 0;
+        let touchEndX = 0;
+        let touchStartY = 0;
+        let touchEndY = 0;
+        let isDragging = false;
 
         function renderCards() {
             container.innerHTML = data.map(item => renderCardFn(item)).join('');
@@ -371,22 +378,85 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
+        function goToPrev() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateSliderPosition();
+                resetAutoSlide();
+            }
+        }
+
+        function goToNext() {
+            maxVisible = getVisibleCards();
+            if (currentIndex < data.length - maxVisible) {
+                currentIndex++;
+                updateSliderPosition();
+                resetAutoSlide();
+            }
+        }
+
         if (prevBtn && nextBtn) {
-            prevBtn.addEventListener('click', function() {
-                if (currentIndex > 0) {
-                    currentIndex--;
-                    updateSliderPosition();
-                    resetAutoSlide();
+            prevBtn.addEventListener('click', goToPrev);
+            nextBtn.addEventListener('click', goToNext);
+        }
+
+        // Touch event handlers
+        function handleTouchStart(e) {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            isDragging = true;
+            container.style.transition = 'none';
+            clearInterval(autoSlideInterval);
+        }
+
+        function handleTouchMove(e) {
+            if (!isDragging) return;
+            touchEndX = e.touches[0].clientX;
+            touchEndY = e.touches[0].clientY;
+            
+            const diffX = Math.abs(touchEndX - touchStartX);
+            const diffY = Math.abs(touchEndY - touchStartY);
+            
+            // Only prevent default if horizontal swipe is dominant
+            if (diffX > diffY && diffX > 10) {
+                e.preventDefault();
+            }
+        }
+
+        function handleTouchEnd() {
+            if (!isDragging) return;
+            isDragging = false;
+            container.style.transition = 'transform 0.5s ease';
+            
+            const diffX = touchStartX - touchEndX;
+            const diffY = Math.abs(touchStartY - touchEndY);
+            const threshold = 50;
+            
+            // Only register as swipe if horizontal movement is dominant
+            if (Math.abs(diffX) > threshold && Math.abs(diffX) > diffY) {
+                if (diffX > 0) {
+                    // Swiped left, go next
+                    goToNext();
+                } else {
+                    // Swiped right, go prev
+                    goToPrev();
                 }
-            });
-            nextBtn.addEventListener('click', function() {
-                maxVisible = getVisibleCards();
-                if (currentIndex < data.length - maxVisible) {
-                    currentIndex++;
-                    updateSliderPosition();
-                    resetAutoSlide();
-                }
-            });
+            } else {
+                // Snap back to current position
+                updateSliderPosition();
+                startAutoSlide();
+            }
+            
+            touchStartX = 0;
+            touchEndX = 0;
+        }
+
+        // Add touch event listeners
+        if (container.parentElement) {
+            const wrapper = container.parentElement;
+            wrapper.addEventListener('touchstart', handleTouchStart, { passive: false });
+            wrapper.addEventListener('touchmove', handleTouchMove, { passive: false });
+            wrapper.addEventListener('touchend', handleTouchEnd);
         }
 
         function startAutoSlide() {
