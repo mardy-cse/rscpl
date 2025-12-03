@@ -500,7 +500,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const servicesData = @json($services);
     initializeSlider('servicesSlider', servicesData, function(service) {
         return `
-                <div class="slider-card group relative bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+                <a href="/service/${service.id}" class="slider-card group relative bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 block">
                     ${service.image ? `
                         <div class="absolute inset-0 z-0">
                             <img src="${imageUrl(service.image)}" 
@@ -530,7 +530,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             </span>
                         </div>
                     </div>
-                </div>
+                </a>
             `;
     });
 
@@ -538,7 +538,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const projectsData = @json($projects);
     initializeSlider('projectsSlider', projectsData, function(project) {
         return `
-            <div class="slider-card group relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+            <a href="/project/${project.id}" class="slider-card group relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 block">
                 ${project.image ? `
                     <img src="${imageUrl(project.image)}" 
                          alt="${escapeHtml(project.title)}" 
@@ -558,7 +558,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         ${escapeHtml(project.description || '')}
                     </p>
                 </div>
-            </div>
+            </a>
         `;
     });
 
