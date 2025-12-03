@@ -18,7 +18,7 @@ if (! function_exists('imageUrl')) {
     /**
      * Get image URL that works in both local and live environments
      *
-     * @param string $path Relative path to image (e.g., 'services/image.jpg')
+     * @param string $path Relative path to image (e.g., 'uploads/services/image.jpg')
      * @return string Full URL to the image or empty string if not found
      */
     function imageUrl($path)
@@ -31,7 +31,7 @@ if (! function_exists('imageExists')) {
     /**
      * Check if an image exists
      *
-     * @param string $path Relative path to image
+     * @param string $path Relative path to image (e.g., 'uploads/services/image.jpg')
      * @return bool
      */
     function imageExists($path)

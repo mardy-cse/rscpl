@@ -7,7 +7,7 @@ class ImageHelper
     /**
      * Get the image URL that works in both local and live environments
      * 
-     * @param string $path Relative path to image (e.g., 'services/image.jpg')
+     * @param string $path Relative path to image (e.g., 'uploads/services/image.jpg')
      * @return string Full URL to the image or empty string if not found
      */
     public static function getImageUrl($path)
@@ -16,18 +16,15 @@ class ImageHelper
             return '';
         }
 
-        // Check if running on shared hosting (public/uploads) or local (storage/app/public)
-        $publicPath = public_path('uploads/' . $path);
-        $storagePath = storage_path('app/public/' . $path);
-
-        // Prefer public/uploads if it exists (for shared hosting)
-        if (file_exists($publicPath)) {
-            return asset('uploads/' . $path);
-        }
-
-        // Fall back to storage symlink if it exists (for local development)
-        if (file_exists($storagePath)) {
-            return asset('storage/' . $path);
+        // Remove leading slash if present
+        $path = ltrim($path, '/');
+        
+        // Use Laravel's public_path() for cross-platform compatibility
+        $absolutePath = public_path($path);
+        
+        // Check if file exists using absolute path
+        if (file_exists($absolutePath)) {
+            return asset($path);
         }
 
         // Return empty string if file doesn't exist
@@ -38,18 +35,11 @@ class ImageHelper
      * Get the full file path for storing images
      * 
      * @param string $subdirectory Subdirectory like 'services', 'projects', etc.
-     * @return string Path to store files
+     * @return string Absolute path to store files
      */
     public static function getStoragePath($subdirectory = 'uploads')
     {
-        // Check if public/uploads exists (shared hosting)
-        $publicPath = public_path('uploads');
-        if (is_dir($publicPath) && is_writable($publicPath)) {
-            return 'uploads/' . $subdirectory;
-        }
-
-        // Fall back to storage/app/public (local development)
-        return 'public/' . $subdirectory;
+        return public_path('uploads/' . $subdirectory);
     }
 
     /**
@@ -65,7 +55,7 @@ class ImageHelper
     /**
      * Delete an image file
      * 
-     * @param string $path Relative path to image
+     * @param string $path Relative path to image (e.g., 'uploads/services/image.jpg')
      * @return bool True if deleted successfully
      */
     public static function deleteImage($path)
@@ -74,16 +64,14 @@ class ImageHelper
             return false;
         }
 
-        // Try to delete from public/uploads first
-        $publicPath = public_path('uploads/' . $path);
-        if (file_exists($publicPath)) {
-            return unlink($publicPath);
-        }
-
-        // Try to delete from storage symlink
-        $storagePath = storage_path('app/public/' . $path);
-        if (file_exists($storagePath)) {
-            return unlink($storagePath);
+        // Remove leading slash if present
+        $path = ltrim($path, '/');
+        
+        // Use Laravel's public_path() for cross-platform compatibility
+        $absolutePath = public_path($path);
+        
+        if (file_exists($absolutePath)) {
+            return unlink($absolutePath);
         }
 
         return false;
@@ -92,7 +80,7 @@ class ImageHelper
     /**
      * Check if image exists
      * 
-     * @param string $path Relative path to image
+     * @param string $path Relative path to image (e.g., 'uploads/services/image.jpg')
      * @return bool True if image exists
      */
     public static function imageExists($path)
@@ -101,28 +89,38 @@ class ImageHelper
             return false;
         }
 
-        return file_exists(public_path('uploads/' . $path)) || 
-               file_exists(storage_path('app/public/' . $path));
+        // Remove leading slash if present
+        $path = ltrim($path, '/');
+        
+        // Use Laravel's public_path() for cross-platform compatibility
+        $absolutePath = public_path($path);
+        
+        return file_exists($absolutePath);
     }
 
     /**
      * Get image dimensions
      * 
-     * @param string $path Relative path to image
+     * @param string $path Relative path to image (e.g., 'uploads/services/image.jpg')
      * @return array|false Array with 'width' and 'height' or false if not found
      */
     public static function getImageDimensions($path)
     {
-        $publicPath = public_path('uploads/' . $path);
-        $storagePath = storage_path('app/public/' . $path);
-
-        $filePath = file_exists($publicPath) ? $publicPath : $storagePath;
-
-        if (!file_exists($filePath)) {
+        if (!$path) {
             return false;
         }
 
-        $size = getimagesize($filePath);
+        // Remove leading slash if present
+        $path = ltrim($path, '/');
+        
+        // Use Laravel's public_path() for cross-platform compatibility
+        $absolutePath = public_path($path);
+
+        if (!file_exists($absolutePath)) {
+            return false;
+        }
+
+        $size = getimagesize($absolutePath);
         if ($size === false) {
             return false;
         }

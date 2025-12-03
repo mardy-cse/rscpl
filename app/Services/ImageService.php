@@ -17,20 +17,37 @@ class ImageService
     public function uploadImage(UploadedFile $file, $directory = 'uploads')
     {
         try {
+            // Normalize directory name
             $subdirectory = str_replace('uploads/', '', $directory);
-            $storagePath = ImageHelper::getStoragePath($subdirectory);
+            
+            // Generate unique filename with timestamp to prevent overwriting
             $filename = uniqid() . '_' . time() . '.' . $file->getClientOriginalExtension();
-
-            // Determine whether to use public/uploads or storage based on availability
-            $publicPath = public_path('uploads/' . $subdirectory);
-            if (is_dir($publicPath) && is_writable($publicPath)) {
-                // Shared hosting: use public/uploads
-                $file->move($publicPath, $filename);
-                return $subdirectory . '/' . $filename;
-            } else {
-                // Local development: use storage/app/public
-                return $file->storeAs('public/' . $subdirectory, $filename);
+            
+            // Use Laravel's public_path() for cross-platform compatibility
+            // This works on Windows (XAMPP), Linux (shared hosting), and any environment
+            $uploadDir = public_path('uploads/' . $subdirectory);
+            
+            // Check if upload directory exists, if not create it with proper permissions
+            if (!is_dir($uploadDir)) {
+                if (!mkdir($uploadDir, 0755, true)) {
+                    \Log::error("Failed to create upload directory: {$uploadDir}");
+                    return null;
+                }
             }
+            
+            // Ensure directory is writable
+            if (!is_writable($uploadDir)) {
+                \Log::error("Upload directory is not writable: {$uploadDir}");
+                return null;
+            }
+            
+            // Move uploaded file using Laravel's file system
+            $file->move($uploadDir, $filename);
+            
+            // Return relative path for database storage (works on any domain)
+            $relativePath = 'uploads/' . $subdirectory . '/' . $filename;
+            return $relativePath;
+            
         } catch (\Exception $e) {
             \Log::error('Image upload failed: ' . $e->getMessage());
             return null;
