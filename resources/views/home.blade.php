@@ -206,21 +206,30 @@
     padding: 0 60px;
 }
 
+.slider-container.centered {
+    display: flex;
+    justify-content: center;
+    padding: 0 20px;
+}
+
 .slider-wrapper {
     overflow: hidden;
     position: relative;
     width: 100%;
+    padding: 0 4px;
 }
 
 .slider-track {
     display: flex;
     transition: transform 0.5s ease;
     gap: 24px;
+    width: 100%;
 }
 
 .slider-card {
-    flex: 0 0 calc(33.333% - 16px);
-    min-width: 350px;
+    flex: 0 0 calc((100% - 48px) / 3);
+    box-sizing: border-box;
+    max-width: calc((100% - 48px) / 3);
 }
 
 .slider-arrows {
@@ -233,12 +242,16 @@
     border-radius: 50%;
     border: none;
     cursor: pointer;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     background: rgba(255, 255, 255, 0.9);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
+}
+
+.slider-arrows.visible {
+    display: flex;
 }
 
 .slider-arrows:hover {
@@ -260,46 +273,30 @@
     color: #374151;
 }
 
+.slider-arrows:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+@media (max-width: 1024px) {
+    .slider-card {
+        flex: 0 0 calc((100% - 24px) / 2);
+        max-width: calc((100% - 24px) / 2);
+    }
+}
+
 @media (max-width: 768px) {
     .slider-container {
         padding: 0 20px;
     }
     
     .slider-card {
-        flex: 0 0 280px;
-        min-width: 280px;
+        flex: 0 0 100%;
+        max-width: 100%;
     }
     
     .slider-arrows {
-        display: none;
-    }
-}
-}
-
-.slider-track {
-    display: flex;
-    transition: transform 0.5s ease-in-out;
-    width: fit-content;
-}
-
-.slider-card {
-    flex: 0 0 auto;
-    margin-right: 2rem;
-    width: 350px;
-}
-
-.slider-card:last-child {
-    margin-right: 0;
-}
-
-@media (max-width: 768px) {
-    .slider-arrows {
-        display: none;
-    }
-    
-    .slider-card {
-        width: 280px;
-        margin-right: 1rem;
+        display: none !important;
     }
 }
 </style>
@@ -326,17 +323,113 @@ document.addEventListener('DOMContentLoaded', function() {
         return 3; // Desktop
     }
 
-    // Services Slider Implementation
-    const servicesData = @json($services);
-    const servicesContainer = document.getElementById('servicesSlider');
-    
-    if (servicesContainer && servicesData && servicesData.length > 0) {
+    function getGapSize(maxVisible) {
+        return 24 * (maxVisible - 1);
+    }
+
+    // Universal Slider Function
+    function initializeSlider(sliderId, data, renderCardFn) {
+        const container = document.getElementById(sliderId);
+        if (!container || !data || data.length === 0) return;
+
+        const sliderContainer = container.closest('.slider-container');
+        const prevBtn = document.getElementById(`${sliderId}-prev`);
+        const nextBtn = document.getElementById(`${sliderId}-next`);
+        
         let currentIndex = 0;
         let maxVisible = getVisibleCards();
-        
-        // Render service cards
-        function renderServices() {
-            servicesContainer.innerHTML = servicesData.map(service => `
+        let autoSlideInterval;
+
+        function renderCards() {
+            container.innerHTML = data.map(item => renderCardFn(item)).join('');
+        }
+
+        function updateSliderPosition() {
+            maxVisible = getVisibleCards();
+            const gapSize = getGapSize(maxVisible);
+            const cardWidthPercent = (100 - (gapSize / container.parentElement.offsetWidth * 100)) / maxVisible;
+            const gapPercent = (24 / container.parentElement.offsetWidth * 100);
+            const movePercent = cardWidthPercent + gapPercent;
+            const translateX = -(currentIndex * movePercent);
+            container.style.transform = `translateX(${translateX}%)`;
+            updateNavigationState();
+        }
+
+        function updateNavigationState() {
+            if (!prevBtn || !nextBtn) return;
+            const totalSlides = Math.max(0, data.length - maxVisible);
+            if (data.length <= maxVisible) {
+                prevBtn.classList.remove('visible');
+                nextBtn.classList.remove('visible');
+                if (sliderContainer) sliderContainer.classList.add('centered');
+            } else {
+                prevBtn.classList.add('visible');
+                nextBtn.classList.add('visible');
+                if (sliderContainer) sliderContainer.classList.remove('centered');
+                prevBtn.disabled = currentIndex === 0;
+                nextBtn.disabled = currentIndex >= totalSlides;
+            }
+        }
+
+        if (prevBtn && nextBtn) {
+            prevBtn.addEventListener('click', function() {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    updateSliderPosition();
+                    resetAutoSlide();
+                }
+            });
+            nextBtn.addEventListener('click', function() {
+                maxVisible = getVisibleCards();
+                if (currentIndex < data.length - maxVisible) {
+                    currentIndex++;
+                    updateSliderPosition();
+                    resetAutoSlide();
+                }
+            });
+        }
+
+        function startAutoSlide() {
+            if (data.length <= maxVisible) return;
+            autoSlideInterval = setInterval(function() {
+                maxVisible = getVisibleCards();
+                if (currentIndex >= data.length - maxVisible) {
+                    currentIndex = 0;
+                } else {
+                    currentIndex++;
+                }
+                updateSliderPosition();
+            }, 4000);
+        }
+
+        function resetAutoSlide() {
+            clearInterval(autoSlideInterval);
+            startAutoSlide();
+        }
+
+        let resizeTimeout;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(function() {
+                const oldMaxVisible = maxVisible;
+                maxVisible = getVisibleCards();
+                if (oldMaxVisible !== maxVisible) {
+                    const maxIndex = Math.max(0, data.length - maxVisible);
+                    if (currentIndex > maxIndex) currentIndex = maxIndex;
+                    updateSliderPosition();
+                }
+            }, 250);
+        });
+
+        renderCards();
+        updateSliderPosition();
+        startAutoSlide();
+    }
+
+    // Services Slider
+    const servicesData = @json($services);
+    initializeSlider('servicesSlider', servicesData, function(service) {
+        return `
                 <div class="slider-card group relative bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
                     ${service.image ? `
                         <div class="absolute inset-0 z-0">
@@ -368,67 +461,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     </div>
                 </div>
-            `).join('');
-        }
-        
-        function updateSliderPosition() {
-            const translateX = -(currentIndex * (100 / maxVisible));
-            servicesContainer.style.transform = `translateX(${translateX}%)`;
-        }
+            `;
+    });
 
-        // Navigation
-        const prevBtn = document.getElementById('servicesSlider-prev');
-        const nextBtn = document.getElementById('servicesSlider-next');
-        
-        if (prevBtn && nextBtn) {
-            prevBtn.addEventListener('click', function() {
-                if (currentIndex > 0) {
-                    currentIndex--;
-                    updateSliderPosition();
-                }
-            });
-            
-            nextBtn.addEventListener('click', function() {
-                if (currentIndex < servicesData.length - maxVisible) {
-                    currentIndex++;
-                    updateSliderPosition();
-                }
-            });
-            
-            // Hide arrows if not enough cards
-            if (servicesData.length <= maxVisible) {
-                prevBtn.style.display = 'none';
-                nextBtn.style.display = 'none';
-            }
-        }
-
-        // Auto slide
-        if (servicesData.length > maxVisible) {
-            setInterval(function() {
-                if (currentIndex >= servicesData.length - maxVisible) {
-                    currentIndex = 0;
-                } else {
-                    currentIndex++;
-                }
-                updateSliderPosition();
-            }, 4000);
-        }
-
-        // Initialize
-        renderServices();
-    }
-
-    // Projects Slider - Full Functionality
+    // Projects Slider
     const projectsData = @json($projects);
-    const projectsContainer = document.getElementById('projectsSlider');
-    
-    if (projectsContainer && projectsData && projectsData.length > 0) {
-        let currentProjectIndex = 0;
-        let maxVisibleProjects = getVisibleCards();
-        
-        // Render project cards
-        function renderProjects() {
-            projectsContainer.innerHTML = projectsData.map(project => `
+    initializeSlider('projectsSlider', projectsData, function(project) {
+        return `
             <div class="slider-card group relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
                 ${project.image ? `
                     <img src="${imageUrl(project.image)}" 
@@ -442,95 +481,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div class="absolute bottom-0 left-0 right-0 p-6 text-white transform translate-y-6 group-hover:translate-y-0 transition-transform duration-300">
                     <span class="inline-block bg-blue-600 px-3 py-1 rounded-full text-xs font-semibold mb-2">
-                        ${escapeHtml(project.category)}
+                        ${escapeHtml(project.category || 'Project')}
                     </span>
                     <h3 class="text-xl font-bold mb-2">${escapeHtml(project.title)}</h3>
                     <p class="text-sm text-gray-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
-                        ${escapeHtml(project.description)}
+                        ${escapeHtml(project.description || '')}
                     </p>
                 </div>
             </div>
-        `).join('');
-        }
-        
-        function updateProjectSliderPosition() {
-            maxVisibleProjects = getVisibleCards();
-            const cardWidth = 100 / maxVisibleProjects;
-            const translateX = -(currentProjectIndex * cardWidth);
-            projectsContainer.style.transform = `translateX(${translateX}%)`;
-            
-            // Update navigation button states
-            const prevBtn = document.getElementById('projectsSlider-prev');
-            const nextBtn = document.getElementById('projectsSlider-next');
-            
-            if (prevBtn) prevBtn.style.opacity = currentProjectIndex === 0 ? '0.5' : '1';
-            if (nextBtn) nextBtn.style.opacity = currentProjectIndex >= projectsData.length - maxVisibleProjects ? '0.5' : '1';
-        }
+        `;
+    });
 
-        // Navigation Event Listeners for Projects
-        const projectPrevBtn = document.getElementById('projectsSlider-prev');
-        const projectNextBtn = document.getElementById('projectsSlider-next');
-        
-        if (projectPrevBtn && projectNextBtn) {
-            projectPrevBtn.addEventListener('click', function() {
-                if (currentProjectIndex > 0) {
-                    currentProjectIndex--;
-                    updateProjectSliderPosition();
-                }
-            });
-            
-            projectNextBtn.addEventListener('click', function() {
-                maxVisibleProjects = getVisibleCards();
-                if (currentProjectIndex < projectsData.length - maxVisibleProjects) {
-                    currentProjectIndex++;
-                    updateProjectSliderPosition();
-                }
-            });
-            
-            // Update arrow visibility
-            function updateProjectArrowVisibility() {
-                maxVisibleProjects = getVisibleCards();
-                const showArrows = projectsData.length > maxVisibleProjects;
-                projectPrevBtn.style.display = showArrows ? 'flex' : 'none';
-                projectNextBtn.style.display = showArrows ? 'flex' : 'none';
-            }
-            updateProjectArrowVisibility();
-        }
-
-        // Auto slide for projects
-        let projectAutoSlideInterval;
-        function startProjectAutoSlide() {
-            clearInterval(projectAutoSlideInterval);
-            if (projectsData.length > getVisibleCards()) {
-                projectAutoSlideInterval = setInterval(function() {
-                    maxVisibleProjects = getVisibleCards();
-                    if (currentProjectIndex >= projectsData.length - maxVisibleProjects) {
-                        currentProjectIndex = 0;
-                    } else {
-                        currentProjectIndex++;
-                    }
-                    updateProjectSliderPosition();
-                }, 4500);
-            }
-        }
-        
-        // Initialize projects
-        renderProjects();
-        updateProjectSliderPosition();
-        startProjectAutoSlide();
-    }
-
-    // Testimonials Slider - Full Functionality
+    // Testimonials Slider
     const testimonialsData = @json($testimonials);
-    const testimonialsContainer = document.getElementById('testimonialsSlider');
-    
-    if (testimonialsContainer && testimonialsData && testimonialsData.length > 0) {
-        let currentTestimonialIndex = 0;
-        let maxVisibleTestimonials = getVisibleCards();
-        
-        // Render testimonials
-        function renderTestimonials() {
-            testimonialsContainer.innerHTML = testimonialsData.map(testimonial => `
+    initializeSlider('testimonialsSlider', testimonialsData, function(testimonial) {
+        return `
             <div class="slider-card bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow">
                 <div class="flex gap-1 mb-4">
                     ${Array(parseInt(testimonial.rating || 5)).fill().map(() => `
@@ -539,7 +504,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </svg>
                     `).join('')}
                 </div>
-                <p class="text-gray-600 mb-6 italic">"${escapeHtml(testimonial.message)}"</p>
+                <p class="text-gray-600 mb-6 italic">"${escapeHtml(testimonial.content || testimonial.message || '')}"</p>
                 <div class="flex items-center gap-4">
                     ${testimonial.avatar ? `
                         <img src="${imageUrl(testimonial.avatar)}" 
@@ -552,79 +517,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     `}
                     <div>
                         <div class="font-bold text-gray-900">${escapeHtml(testimonial.name)}</div>
-                        <div class="text-sm text-gray-500">${escapeHtml(testimonial.company)}</div>
+                        <div class="text-sm text-gray-500">${escapeHtml(testimonial.company || '')}</div>
                     </div>
                 </div>
             </div>
-        `).join('');
-        }
-        
-        function updateTestimonialSliderPosition() {
-            maxVisibleTestimonials = getVisibleCards();
-            const cardWidth = 100 / maxVisibleTestimonials;
-            const translateX = -(currentTestimonialIndex * cardWidth);
-            testimonialsContainer.style.transform = `translateX(${translateX}%)`;
-            
-            // Update navigation button states
-            const prevBtn = document.getElementById('testimonialsSlider-prev');
-            const nextBtn = document.getElementById('testimonialsSlider-next');
-            
-            if (prevBtn) prevBtn.style.opacity = currentTestimonialIndex === 0 ? '0.5' : '1';
-            if (nextBtn) nextBtn.style.opacity = currentTestimonialIndex >= testimonialsData.length - maxVisibleTestimonials ? '0.5' : '1';
-        }
-
-        // Navigation Event Listeners for Testimonials
-        const testimonialPrevBtn = document.getElementById('testimonialsSlider-prev');
-        const testimonialNextBtn = document.getElementById('testimonialsSlider-next');
-        
-        if (testimonialPrevBtn && testimonialNextBtn) {
-            testimonialPrevBtn.addEventListener('click', function() {
-                if (currentTestimonialIndex > 0) {
-                    currentTestimonialIndex--;
-                    updateTestimonialSliderPosition();
-                }
-            });
-            
-            testimonialNextBtn.addEventListener('click', function() {
-                maxVisibleTestimonials = getVisibleCards();
-                if (currentTestimonialIndex < testimonialsData.length - maxVisibleTestimonials) {
-                    currentTestimonialIndex++;
-                    updateTestimonialSliderPosition();
-                }
-            });
-            
-            // Update arrow visibility
-            function updateTestimonialArrowVisibility() {
-                maxVisibleTestimonials = getVisibleCards();
-                const showArrows = testimonialsData.length > maxVisibleTestimonials;
-                testimonialPrevBtn.style.display = showArrows ? 'flex' : 'none';
-                testimonialNextBtn.style.display = showArrows ? 'flex' : 'none';
-            }
-            updateTestimonialArrowVisibility();
-        }
-
-        // Auto slide for testimonials
-        let testimonialAutoSlideInterval;
-        function startTestimonialAutoSlide() {
-            clearInterval(testimonialAutoSlideInterval);
-            if (testimonialsData.length > getVisibleCards()) {
-                testimonialAutoSlideInterval = setInterval(function() {
-                    maxVisibleTestimonials = getVisibleCards();
-                    if (currentTestimonialIndex >= testimonialsData.length - maxVisibleTestimonials) {
-                        currentTestimonialIndex = 0;
-                    } else {
-                        currentTestimonialIndex++;
-                    }
-                    updateTestimonialSliderPosition();
-                }, 5000);
-            }
-        }
-        
-        // Initialize testimonials
-        renderTestimonials();
-        updateTestimonialSliderPosition();
-        startTestimonialAutoSlide();
-    }
+        `;
+    });
 });
 </script>
 @endsection
