@@ -4,7 +4,8 @@ namespace App\Services;
 
 use Illuminate\Http\UploadedFile;
 use App\Helpers\ImageHelper;
-use Intervention\Image\Laravel\Facades\Image;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 use Illuminate\Support\Facades\Log;
 
 class ImageService
@@ -48,8 +49,9 @@ class ImageService
                 return null;
             }
             
-            // Load image using Intervention Image
-            $image = Image::read($file->getRealPath());
+            // Load image using Intervention Image with explicit GD driver
+            $manager = new ImageManager(new Driver());
+            $image = $manager->read($file->getRealPath());
             
             // Get original dimensions
             $originalWidth = $image->width();
