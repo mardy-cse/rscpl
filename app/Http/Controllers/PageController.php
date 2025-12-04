@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Contact;
 use App\Models\Service;
 use App\Models\Project;
-use App\Models\GalleryImage;
 use App\Models\AboutContent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
