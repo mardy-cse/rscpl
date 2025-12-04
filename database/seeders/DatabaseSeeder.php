@@ -191,21 +191,21 @@ class DatabaseSeeder extends Seeder
         // Create About Content
         $aboutContents = [
             [
-                'section_key' => 'who_we_are',
+                'section_key' => 'hero',
                 'title' => 'Who We Are',
                 'content' => 'HTR ENGINEERING PTE LTD is a leading provider of roller shutters, security grilles, automatic gates, and metal fabrication services in Singapore. With over 15 years of experience, we have established ourselves as a trusted name in the industry, delivering quality solutions to residential, commercial, and industrial clients.',
                 'is_active' => true,
                 'order' => 1,
             ],
             [
-                'section_key' => 'our_mission',
+                'section_key' => 'mission',
                 'title' => 'Our Mission',
                 'content' => 'Our mission is to provide innovative, high-quality security and automation solutions that exceed our clients\' expectations. We are committed to excellence in every project, ensuring customer satisfaction through professional service, quality workmanship, and reliable after-sales support.',
                 'is_active' => true,
                 'order' => 2,
             ],
             [
-                'section_key' => 'why_choose_us',
+                'section_key' => 'vision',
                 'title' => 'Why Choose Us',
                 'content' => 'Choose HTR Engineering for our extensive experience, professional team, quality materials, competitive pricing, and dedicated customer service. We pride ourselves on completing projects on time and within budget while maintaining the highest standards of workmanship.',
                 'is_active' => true,

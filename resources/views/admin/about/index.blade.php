@@ -75,7 +75,7 @@
                                 </div>
                             </div>
 
-                            @if($content->section_key == 'who_we_are')
+                            @if($content->section_key == 'hero')
                             <div class="lg:col-span-1">
                                 <div class="mb-4">
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Company Image</label>
