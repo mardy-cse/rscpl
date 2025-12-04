@@ -4,11 +4,19 @@ namespace App\Services;
 
 use Illuminate\Http\UploadedFile;
 use App\Helpers\ImageHelper;
+use Intervention\Image\Laravel\Facades\Image;
+use Illuminate\Support\Facades\Log;
 
 class ImageService
 {
+    // Maximum width for uploaded images
+    private const MAX_WIDTH = 1920;
+    
+    // WebP quality (0-100, 80 is optimal for size vs quality)
+    private const WEBP_QUALITY = 80;
+
     /**
-     * Upload an image file
+     * Upload an image file with automatic WebP conversion and resizing
      * 
      * @param UploadedFile $file The uploaded file
      * @param string $directory Subdirectory to store in (services, projects, testimonials, about)
@@ -20,36 +28,58 @@ class ImageService
             // Normalize directory name
             $subdirectory = str_replace('uploads/', '', $directory);
             
-            // Generate unique filename with timestamp to prevent overwriting
-            $filename = uniqid() . '_' . time() . '.' . $file->getClientOriginalExtension();
+            // Generate unique filename with timestamp (WebP extension)
+            $filename = uniqid() . '_' . time() . '.webp';
             
             // Use Laravel's public_path() for cross-platform compatibility
-            // This works on Windows (XAMPP), Linux (shared hosting), and any environment
             $uploadDir = public_path('uploads/' . $subdirectory);
             
             // Check if upload directory exists, if not create it with proper permissions
             if (!is_dir($uploadDir)) {
                 if (!mkdir($uploadDir, 0755, true)) {
-                    \Log::error("Failed to create upload directory: {$uploadDir}");
+                    Log::error("Failed to create upload directory: {$uploadDir}");
                     return null;
                 }
             }
             
             // Ensure directory is writable
             if (!is_writable($uploadDir)) {
-                \Log::error("Upload directory is not writable: {$uploadDir}");
+                Log::error("Upload directory is not writable: {$uploadDir}");
                 return null;
             }
             
-            // Move uploaded file using Laravel's file system
-            $file->move($uploadDir, $filename);
+            // Load image using Intervention Image
+            $image = Image::read($file->getRealPath());
+            
+            // Get original dimensions
+            $originalWidth = $image->width();
+            $originalHeight = $image->height();
+            
+            // Resize if width exceeds maximum
+            if ($originalWidth > self::MAX_WIDTH) {
+                $newHeight = (int) (($originalHeight / $originalWidth) * self::MAX_WIDTH);
+                $image->resize(self::MAX_WIDTH, $newHeight);
+                
+                Log::info("Image resized from {$originalWidth}x{$originalHeight} to " . self::MAX_WIDTH . "x{$newHeight}");
+            }
+            
+            // Convert to WebP and save with compression
+            $outputPath = $uploadDir . '/' . $filename;
+            $image->toWebp(self::WEBP_QUALITY)->save($outputPath);
+            
+            // Log success
+            $originalSize = $file->getSize();
+            $newSize = filesize($outputPath);
+            $savedPercentage = round((($originalSize - $newSize) / $originalSize) * 100, 1);
+            
+            Log::info("Image converted to WebP. Original: " . round($originalSize/1024, 2) . "KB, WebP: " . round($newSize/1024, 2) . "KB (Saved {$savedPercentage}%)");
             
             // Return relative path for database storage (works on any domain)
             $relativePath = 'uploads/' . $subdirectory . '/' . $filename;
             return $relativePath;
             
         } catch (\Exception $e) {
-            \Log::error('Image upload failed: ' . $e->getMessage());
+            Log::error('Image upload failed: ' . $e->getMessage());
             return null;
         }
     }
