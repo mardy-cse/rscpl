@@ -111,10 +111,26 @@ Complete guide to the image handling system:
 ## 📋 Requirements
 
 - PHP 8.2 or higher
+- PHP GD Extension (required for image processing)
 - MySQL 5.7+ or MariaDB 10.3+
 - Composer
 - Apache/Nginx web server
 - Git (for version control)
+
+### Enable GD Extension
+**XAMPP (Windows):**
+```bash
+# Edit php.ini (C:\xampp\php\php.ini)
+# Uncomment the line:
+extension=gd
+# Restart Apache/PHP
+```
+
+**Linux:**
+```bash
+sudo apt-get install php8.2-gd
+sudo systemctl restart apache2
+```
 
 ---
 
